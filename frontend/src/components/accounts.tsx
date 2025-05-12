@@ -44,13 +44,13 @@ export function AccountSelector({
       const authRequest = isOwner ? {
         accountOwner: {
           account: account.address,
-          app: process.env.NEXT_PUBLIC_APP_ADDRESS,
+          app:  process.env.NEXT_PUBLIC_ENVIRONMENT === "development" ? process.env.NEXT_PUBLIC_APP_ADDRESS_TESTNET : process.env.NEXT_PUBLIC_APP_ADDRESS_MAINNET,
           owner: walletClient.account.address,
         }
       } : {
         accountManager: {
           account: account.address,
-          app: process.env.NEXT_PUBLIC_APP_ADDRESS,
+          app:  process.env.NEXT_PUBLIC_ENVIRONMENT === "development" ? process.env.NEXT_PUBLIC_APP_ADDRESS_TESTNET : process.env.NEXT_PUBLIC_APP_ADDRESS_MAINNET,
           manager: walletClient.account.address,
         }
       }

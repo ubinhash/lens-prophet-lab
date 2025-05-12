@@ -1,4 +1,5 @@
 import { Login } from "@/components/login";
+import { Logout } from "@/components/logout";
 import { getLensClient } from "@/lib/lens/client";
 import { fetchAccount } from "@lens-protocol/client/actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,6 +21,15 @@ async function getAuthenticatedAccount() {
   }
 
   return fetchAccount(client, { address: authenticatedUser.address }).unwrapOr(null);
+}
+
+
+export async function logoutFromLens() {
+  const client = await getLensClient();
+
+  if (client.isSessionClient()) {
+    await client.logout();
+  }
 }
 
 export default async function Home() {
@@ -60,6 +70,7 @@ export default async function Home() {
           <p className="text-sm text-muted-foreground">
             Successfully authenticated with Lens Protocol
           </p>
+          <Logout />
         </CardContent>
       </Card>
     </div>

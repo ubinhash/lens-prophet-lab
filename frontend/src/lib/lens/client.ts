@@ -5,7 +5,8 @@ import { env } from "process";
 const isServer = typeof window === "undefined";
 
 const publicClient = PublicClient.create({
-  environment: env.NEXT_PUBLIC_ENVIRONMENT === "development" ? testnet : mainnet,
+  // environment:testnet,
+  environment: process.env.NEXT_PUBLIC_ENVIRONMENT === "development" ? testnet : mainnet,
   origin: "https://totally.real.com",
   storage: isServer ? cookieStorage : clientCookieStorage,
 });
