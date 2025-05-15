@@ -31,18 +31,19 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           <div>
           <div className="fixed top-0 left-0 w-full bg-background/80 backdrop-blur-sm border-b z-10 p-4">
             <div className="max-w-7xl mx-auto flex justify-between items-center">
+            <Link href="/" >
               <h1 className="text-xl font-bold">Lens Prophet Lab</h1>
-
+              </Link>
               {/* Centered Links Container */}
               <div className="absolute left-1/2 transform -translate-x-1/2 flex gap-6">
-                <Link href="https://lens.xyz/docs" target="_blank" className="text-primary hover:underline">
+                <Link href="/create" className="text-primary hover:underline">
                   Create Prediction
                 </Link>
-                <Link href="https://developer.lens.xyz/apps" target="_blank" className="text-primary hover:underline">
+                <Link href="/discover" target="_blank" className="text-primary hover:underline">
                   Discover
                 </Link>
-                <Link href="https://developer.lens.xyz/apps" target="_blank" className="text-primary hover:underline">
-                  Leaderboard
+                <Link href="/leaderboard" target="_blank" className="text-primary hover:underline">
+                 Top Prophets
                 </Link>
               </div>
 
