@@ -4,6 +4,9 @@ import "../../public/globals.css";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 
+import { Login } from "@/components/login";
+import { Logout } from "@/components/logout";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -26,24 +29,34 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased m-0 p-0 overflow-hidden`}>
         <Providers>
           <div>
-            <div className="fixed top-0 left-0 w-full bg-background/80 backdrop-blur-sm border-b z-10 p-4">
-              <div className="max-w-7xl mx-auto flex justify-between items-center">
-                <h1 className="text-xl font-bold">Lens Starter</h1>
-                <div className="flex items-center gap-4">
-                  <Link href="https://lens.xyz/docs" target="_blank" className="text-primary hover:underline">
-                    Docs
-                  </Link>
-                  <Link href="https://developer.lens.xyz/apps" target="_blank" className="text-primary hover:underline">
-                    Create an App
-                  </Link>
-                  <ThemeToggle />
-                </div>
+          <div className="fixed top-0 left-0 w-full bg-background/80 backdrop-blur-sm border-b z-10 p-4">
+            <div className="max-w-7xl mx-auto flex justify-between items-center">
+              <h1 className="text-xl font-bold">Lens Prophet Lab</h1>
+
+              {/* Centered Links Container */}
+              <div className="absolute left-1/2 transform -translate-x-1/2 flex gap-6">
+                <Link href="https://lens.xyz/docs" target="_blank" className="text-primary hover:underline">
+                  Create Prediction
+                </Link>
+                <Link href="https://developer.lens.xyz/apps" target="_blank" className="text-primary hover:underline">
+                  Discover
+                </Link>
+                <Link href="https://developer.lens.xyz/apps" target="_blank" className="text-primary hover:underline">
+                  Leaderboard
+                </Link>
+              </div>
+
+              {/* Right-Aligned Auth */}
+              <div className="flex items-center gap-4">
+                <Login />
+                <Logout />
               </div>
             </div>
+          </div>
 
             <main className="h-screen w-screen overflow-auto bg-background pt-16">
               <div className="max-w-7xl mx-auto p-4">
-                <div className="mb-8 pb-8 border-b">
+                {/* <div className="mb-8 pb-8 border-b">
                   <h2 className="text-2xl font-bold mb-4">Welcome to Lens Starter Template!</h2>
                   <p className="mb-4">
                     A template for building decentralized social applications on Lens Protocol.
@@ -58,10 +71,12 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
                       </ol>
                     </div>
                   </div>
-                </div>
+                </div> */}
                 {children}
               </div>
-            </main></div>
+            </main>
+            
+            </div>
         </Providers>
       </body>
     </html>

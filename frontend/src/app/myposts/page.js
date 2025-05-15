@@ -57,10 +57,18 @@ const MyPosts = () => {
     const fetch = async () => {
       try {
         setLoading(true);
+        const feed_address= process.env.NEXT_PUBLIC_ENVIRONMENT === "development" ? process.env.NEXT_PUBLIC_TESTNET_FEED_ADDRESS : process.env.NEXT_PUBLIC_MAINNET_FEED_ADDRESS
+        
         const client = await getLensClient();
         const result = await fetchPosts(client, {
           filter: {
             authors: evmAddress(authenticatedAddress),
+            feeds: [
+              {
+                feed: evmAddress(feed_address),
+              },
+            ],
+            
           },
         });
         // const result = await fetchPost(client, {

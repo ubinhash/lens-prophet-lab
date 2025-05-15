@@ -35,44 +35,49 @@ export async function logoutFromLens() {
 export default async function Home() {
   const account = await getAuthenticatedAccount();
 
-  if (!account) {
-    return (
-      <div className="flex flex-col items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Sign in with Lens</CardTitle>
-            <CardDescription>Connect your wallet to access your Lens profile</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Login />
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <Card className="w-full max-w-lg">
-        <CardHeader className="flex flex-row items-center gap-4">
-          <Avatar className="h-16 w-16">
-            <AvatarImage src={account.metadata?.picture} />
-            <AvatarFallback>{account.address.substring(0, 2).toUpperCase()}</AvatarFallback>
-          </Avatar>
-          <div>
-            <CardTitle className="text-xl">{account.metadata?.name}</CardTitle>
-            <CardDescription className="mt-1">
-              {account.address}
-            </CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Successfully authenticated with Lens Protocol
-          </p>
-          <Logout />
-        </CardContent>
-      </Card>
+    <div className="flex flex-col lg:flex-row justify-between p-8">
+    {/* Left Side: Main Text Content */}
+    <div className="max-w-xl flex flex-col h-120">
+        <h1 className="text-6xl font-bold">
+            <span className="border-b-4 border-blue-400 mb-1 inline-block">LENS</span><br />
+            <span className="border-b-4 border-blue-400">PROPHET LAB</span>
+        </h1>
+        <h2 className="text-2xl font-light mt-4">WHERE WORD CARRIES WEIGHT</h2>
+        <ul className="mt-6 text-lg space-y-2">
+            <li>Predict with reasoning</li>
+            <li>Pick your odds based on confidence</li>
+            <li>Rise as a Prophet and build your reputation</li>
+        </ul>
+        <div className="w-40 mt-2">
+            {!account && <Login />}
+            {account &&    
+           <div className="flex gap-x-4 mt-0">
+                <button className="mt-3 px-6 py-3 bg-black text-white rounded" >
+                        Predict
+                </button>
+                <button className="mt-3 px-6 py-3 bg-black text-white rounded" style={{ backgroundColor: 'rgb(137, 179, 82)' }}>
+                    Discover
+                </button>
+             </div>
+         }
+        </div>
+
+        {/* Make this act like a sticky footer in the left column */}
+        <p className="mt-auto pt-10 text-gray-600 text-lg">
+            A Novel Creator Centric Prediction & Social Market
+        </p>
+</div>
+  
+    {/* Right Side: Placeholder Cards */}
+    <div className="flex flex-col space-y-6 mt-12 lg:mt-0 lg:ml-8 ">
+      <div className="w-80 h-60 bg-green-100 rounded shadow-md"></div>
+      <div className="w-80 h-60 bg-rose-100 rounded shadow-md"></div>
     </div>
+  </div>
+  
   );
 }
+

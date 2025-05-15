@@ -44,11 +44,13 @@ export function Login() {
           if (isWalletConnected && authenticatedUser) {
             const displayIdentity = connectKitDisplayName ?? "...";
             return (
-              <div className="flex items-center gap-2 text-sm w-full justify-between">
+              <div className="flex items-center gap-2 text-sm w-full justify-between mt-2">
                 <span className="text-muted-foreground truncate" title={authenticatedUser.address}>
                   Signed in as: <span className="text-primary font-semibold">{displayIdentity}</span>
                 </span>
               </div>
+
+        
             );
           }
 

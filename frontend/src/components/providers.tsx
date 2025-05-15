@@ -12,7 +12,7 @@ import { ThemeProvider } from "next-themes";
 const wagmiConfig = createConfig(
   getDefaultConfig({
     walletConnectProjectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "",
-    chains: [chains.mainnet],
+    chains: [chains.testnet,chains.mainnet],
     transports: {
       [chains.mainnet.id]: http(),
       [chains.testnet.id]: http(),

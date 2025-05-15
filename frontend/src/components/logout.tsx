@@ -35,9 +35,9 @@ export function Logout() {
   // Display the logout button if the user is authenticated
   return authenticatedUser ? (
     <div className="flex items-center justify-between gap-2">
-      <span className="text-sm text-muted-foreground truncate">
+      {/* <span className="text-sm text-muted-foreground truncate">
         Signed in as: <span className="text-primary font-semibold">{authenticatedUser.address}</span>
-      </span>
+      </span> */}
       <Button
         variant="outline"
         size="sm"
