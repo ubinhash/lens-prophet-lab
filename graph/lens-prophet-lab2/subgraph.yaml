@@ -1,0 +1,26 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Contract
+    network: lens-testnet
+    source:
+      address: "0x48d5C7801658b29e413F343B5998c733662b24c4"
+      abi: Contract
+      startBlock: 3579542
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - QuestionCreated
+      abis:
+        - name: Contract
+          file: ./abis/Contract.json
+      eventHandlers:
+        - event: QuestionCreated(indexed address,bytes32,string,uint256)
+          handler: handleQuestionCreated
+      file: ./src/contract.ts
