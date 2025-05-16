@@ -1,0 +1,35 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: QuestionTemplateManager
+    network: lens-testnet
+    source:
+      address: "0x59CD393802cC1f772075d1FAC2294B92D3f519C8"
+      abi: QuestionTemplateManager
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - QuestionCreated
+        - TemplateActivated
+        - TemplateCreated
+        - VariableAdded
+      abis:
+        - name: QuestionTemplateManager
+          file: ./abis/QuestionTemplateManager.json
+      eventHandlers:
+        - event: QuestionCreated(indexed uint256,indexed uint256)
+          handler: handleQuestionCreated
+        - event: TemplateActivated(indexed uint256,bool)
+          handler: handleTemplateActivated
+        - event: TemplateCreated(uint256,string,string)
+          handler: handleTemplateCreated
+        - event: VariableAdded(indexed uint256,string)
+          handler: handleVariableAdded
+      file: ./src/question-template-manager.ts

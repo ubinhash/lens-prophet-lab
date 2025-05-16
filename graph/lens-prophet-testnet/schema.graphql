@@ -19,6 +19,8 @@ type TemplateActivated @entity(immutable: true) {
 type TemplateCreated @entity(immutable: true) {
   id: Bytes!
   QuestionTemplateManager_id: BigInt! # uint256
+  templateText: String!
+  category: String!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
@@ -32,3 +34,58 @@ type VariableAdded @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+type Claimed @entity {
+  id: ID!
+  user: Bytes!
+  amount: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type NewClaim @entity {
+  id: ID!
+  user: Bytes!
+  predictionId: BigInt!
+  amount: BigInt!
+  claimtype: Int! # uint8 -> map to Int
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type PredictionChallenged @entity {
+  id: ID!
+  predictionId: BigInt!
+  challenger: Bytes!
+  amount: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type PredictionCreated @entity {
+  id: ID!
+  predictionId: BigInt!
+  postId: BigInt!
+  questionId: BigInt!
+  sender: Bytes!
+  stake: BigInt!
+  questionText: String!
+  minChallengeStake: BigInt!
+  maxChallengeStake: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type PredictionResolved @entity {
+  id: ID!
+  predictionId: BigInt!
+  resolution: Int! # uint8 enum
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  transactionHash: Bytes!
+}
+

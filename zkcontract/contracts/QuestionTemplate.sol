@@ -31,7 +31,11 @@ contract QuestionTemplateManager {
     mapping(uint256 => Template) public templates;
     mapping(uint256 => Question) public questions;
 
-    event TemplateCreated(uint256 indexed id);
+    event TemplateCreated(
+        uint256 id,
+        string templateText,
+        string category
+    );
     event VariableAdded(uint256 indexed templateId, string name);
     event QuestionCreated(uint256 indexed id, uint256 indexed templateId);
     event TemplateActivated(uint256 indexed id,bool activated);
@@ -76,7 +80,7 @@ contract QuestionTemplateManager {
             active: false,
             variables: new Variable[](0)
         });
-        emit TemplateCreated(templateCounter);
+        emit TemplateCreated(templateCounter, _templateText, _category);
         return templateCounter;
     }
 

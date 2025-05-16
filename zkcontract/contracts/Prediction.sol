@@ -43,7 +43,17 @@ contract PredictionManager {
     address public owner;
     address public feeCollector;
 
-    event PredictionCreated(uint256 indexed id, uint256 postId, uint256 questionId, address sender, uint256 stake);
+    event PredictionCreated(
+        uint256 indexed id,
+        uint256 postId,
+        uint256 questionId,
+        address sender,
+        uint256 stake,
+        string questionText,
+        uint256 minChallengeStake,
+        uint256 maxChallengeStake
+    );
+
     event PredictionChallenged(uint256 indexed id, address challenger, uint256 amount);
     event PredictionResolved(uint256 indexed id, Resolution resolution);
     event Claimed(address user, uint256 amount);
@@ -88,7 +98,7 @@ contract PredictionManager {
             resolution: Resolution.UNRESOLVED
         });
 
-        emit PredictionCreated(predictionCounter, postId, questionId, msg.sender, msg.value);
+        emit PredictionCreated(predictionCounter, postId, questionId, msg.sender, msg.value,questionText,minChallengeStake,maxChallengeStake);
         return predictionCounter;
     }
 

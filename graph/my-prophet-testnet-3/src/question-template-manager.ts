@@ -44,6 +44,8 @@ export function handleTemplateCreated(event: TemplateCreatedEvent): void {
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.QuestionTemplateManager_id = event.params.id
+  entity.templateText = event.params.templateText
+  entity.category = event.params.category
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp

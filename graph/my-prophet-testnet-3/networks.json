@@ -1,0 +1,8 @@
+{
+  "lens-testnet": {
+    "QuestionTemplateManager": {
+      "address": "0x59CD393802cC1f772075d1FAC2294B92D3f519C8",
+      "startBlock": 0
+    }
+  }
+}
