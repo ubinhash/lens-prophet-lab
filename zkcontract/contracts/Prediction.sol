@@ -2,7 +2,11 @@
 pragma solidity ^0.8.20;
 
 interface IQuestionTemplateManager {
-    function createQuestion(uint256 templateId, string[] calldata params) external returns (uint256);
+    function createQuestion(
+        uint256 templateId,
+        string[] memory variableNames,
+        string[] memory variableValues
+    ) external returns (uint256);
 }
 
 contract PredictionManager {
@@ -58,7 +62,8 @@ contract PredictionManager {
     function createPrediction(
         uint256 postId,
         uint256 templateId,
-        string[] calldata templateParams,
+        string[] memory variableNames,
+        string[] memory variableValues,
         string memory questionText,
         uint256 minChallengeStake,
         uint256 maxChallengeStake,
@@ -67,7 +72,7 @@ contract PredictionManager {
         require(msg.value >= globalMinInitialStake, "Initial stake too low");
         require(minChallengeStake >= globalMinChallenge, "Min challenge too low");
 
-        uint256 questionId = templateManager.createQuestion(templateId, templateParams);
+        uint256 questionId = templateManager.createQuestion(templateId, variableNames, variableValues);
 
         predictionCounter++;
         predictions[predictionCounter] = Prediction({
@@ -92,7 +97,7 @@ contract PredictionManager {
         require(pred.resolution == Resolution.UNRESOLVED, "Resolved");
         require(block.timestamp <= pred.challengeDeadline, "Challenge over");
         require(pred.totalChallenged + msg.value <= pred.maxChallengeStake, "Exceeds max");
-
+        require(msg.sender!=pred.sender,"can't challenge yourself");
         pred.totalChallenged += msg.value;
         challenges[predictionId][msg.sender] += msg.value;
 
@@ -108,14 +113,16 @@ contract PredictionManager {
         Prediction storage pred = predictions[predictionId];
         require(pred.resolution == Resolution.UNRESOLVED, "Already resolved");
         pred.resolution = res;
-
-        if (res == Resolution.INVALIDATED) {
+        
+        
+        if (pred.totalChallenged<pred.minChallengeStake||res == Resolution.INVALIDATED) {
             uint256 fee = (pred.initialStake * feePercent) / 100;
             uint256 refund = pred.initialStake - fee;
             balances[feeCollector] += fee;
             _refundChallengers(predictionId);
             balances[pred.sender] += refund;
             claims[predictionId][pred.sender]+=refund;
+            emit NewClaim(feeCollector,predictionId,fee,ClaimType.FEE);
             emit NewClaim(pred.sender,predictionId,refund,ClaimType.REFUND);
         } else if (res == Resolution.WIN) {
             uint256 fee = (pred.totalChallenged * feePercent) / 100;
@@ -123,11 +130,13 @@ contract PredictionManager {
             balances[feeCollector] += fee;
             balances[pred.sender] += pred.initialStake + reward;
             claims[predictionId][pred.sender]+=pred.initialStake + reward;
+            emit NewClaim(feeCollector,predictionId,fee,ClaimType.FEE);
             emit NewClaim(pred.sender,predictionId,pred.initialStake + reward,ClaimType.WINNING);
         } else if (res == Resolution.LOSS) {
             uint256 fee = (pred.initialStake * feePercent) / 100;
             uint256 reward = pred.initialStake - fee;
             balances[feeCollector] += fee;
+            emit NewClaim(feeCollector,predictionId,fee,ClaimType.FEE);
 
             address[] memory challengers = challengerList[predictionId];
             for (uint256 i = 0; i < challengers.length; i++) {
@@ -135,6 +144,7 @@ contract PredictionManager {
                 uint256 stake = challenges[predictionId][challenger];
                 uint256 share = (stake * reward) / pred.totalChallenged;
                 balances[challenger] += stake + share;
+                claims[predictionId][challenger]+=stake + share;
                 emit NewClaim(challenger,predictionId,stake + share,ClaimType.WINNING);
             }
         }
@@ -183,5 +193,15 @@ contract PredictionManager {
         require(newDeadline > block.timestamp, "Deadline must be in future");
 
         pred.challengeDeadline = newDeadline;
+    }
+    function updateConfig(
+        uint256 _globalMinChallenge,
+        uint256 _globalMinInitialStake,
+        uint256 _feePercent
+    ) external onlyOwner {
+        require(_feePercent <= 100, "Fee percent cannot exceed 100");
+        globalMinChallenge = _globalMinChallenge;
+        globalMinInitialStake = _globalMinInitialStake;
+        feePercent = _feePercent;
     }
 }

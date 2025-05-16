@@ -1,0 +1,252 @@
+[
+  { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "templateId",
+        "type": "uint256"
+      }
+    ],
+    "name": "QuestionCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "activated",
+        "type": "bool"
+      }
+    ],
+    "name": "TemplateActivated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      }
+    ],
+    "name": "TemplateCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "templateId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      }
+    ],
+    "name": "VariableAdded",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "operator", "type": "address" }
+    ],
+    "name": "addOperator",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "templateId", "type": "uint256" },
+      { "internalType": "string", "name": "name", "type": "string" },
+      {
+        "internalType": "enum QuestionTemplateManager.ParamType",
+        "name": "paramType",
+        "type": "uint8"
+      },
+      { "internalType": "string[]", "name": "options", "type": "string[]" }
+    ],
+    "name": "addVariable",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "templateId", "type": "uint256" },
+      { "internalType": "string[]", "name": "names", "type": "string[]" },
+      {
+        "internalType": "enum QuestionTemplateManager.ParamType[]",
+        "name": "paramTypes",
+        "type": "uint8[]"
+      },
+      {
+        "internalType": "string[][]",
+        "name": "allOptions",
+        "type": "string[][]"
+      }
+    ],
+    "name": "addVariablesBulk",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "allowedOperators",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "templateId", "type": "uint256" },
+      { "internalType": "bool", "name": "activated", "type": "bool" }
+    ],
+    "name": "changeTemplateActivation",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "templateId", "type": "uint256" },
+      {
+        "internalType": "string[]",
+        "name": "variableNames",
+        "type": "string[]"
+      },
+      {
+        "internalType": "string[]",
+        "name": "variableValues",
+        "type": "string[]"
+      }
+    ],
+    "name": "createQuestion",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "_templateText", "type": "string" },
+      { "internalType": "string", "name": "_category", "type": "string" }
+    ],
+    "name": "createTemplate",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "templateId", "type": "uint256" }
+    ],
+    "name": "getVariables",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "string", "name": "name", "type": "string" },
+          {
+            "internalType": "enum QuestionTemplateManager.ParamType",
+            "name": "paramType",
+            "type": "uint8"
+          },
+          { "internalType": "string[]", "name": "options", "type": "string[]" }
+        ],
+        "internalType": "struct QuestionTemplateManager.Variable[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "questionCounter",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "questions",
+    "outputs": [
+      { "internalType": "uint256", "name": "id", "type": "uint256" },
+      { "internalType": "uint256", "name": "templateId", "type": "uint256" },
+      { "internalType": "bool", "name": "exists", "type": "bool" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "operator", "type": "address" }
+    ],
+    "name": "removeOperator",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "templateId", "type": "uint256" },
+      { "internalType": "string", "name": "variableName", "type": "string" },
+      { "internalType": "string[]", "name": "newOptions", "type": "string[]" }
+    ],
+    "name": "resetOptionsForVariable",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "templateCounter",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "templates",
+    "outputs": [
+      { "internalType": "uint256", "name": "id", "type": "uint256" },
+      { "internalType": "string", "name": "templateText", "type": "string" },
+      { "internalType": "string", "name": "category", "type": "string" },
+      { "internalType": "bool", "name": "active", "type": "bool" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

@@ -2,11 +2,15 @@
 
 ## Project Intro
 
-Every day, influencers make bold market calls — but only celebrate the wins. 
+### The problem we're trying to solve
 
-Lens Prophet Labis here to change that.
+Every day, influencers make bold market calls — but only celebrate the wins and delete their post on lost. 
 
-We are building a user-centric social prediction market where the focus is the the user and the content they create, centered around predictions.
+So how do we discover people who are actually good at making market calls? Lens Prophet Lab is here to change that.
+
+We are building a novel user-centric social prediction market where the focus is the the user and the content they create, centered around predictions.
+
+### Mechanics
 
 Built on Lens Protocol, it’s a social prediction arena where users post future claims and reasoning — like “ETH will hit $5k by October” — and back them with real stakes. Others can challenge by placing bet against those predictions. If you’re right consistently, your reputation grows. If you're wrong, everyone sees it.
 
@@ -34,7 +38,7 @@ We are creating a space where good prophet will get climb on the top and get the
 - Wallet Connection: Connect Kit + Continue with Family 
 - Lens Social Primitive Used: Account & Feed (the prediction's reasoning is stored as lens feed, referenced)
 - Feed Storage: Grove
-- 
+
 
 ### Tools and Library
 

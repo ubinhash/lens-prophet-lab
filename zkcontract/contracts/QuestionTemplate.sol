@@ -53,7 +53,7 @@ contract QuestionTemplateManager {
         owner = msg.sender;
     }
 
-      function addOperator(address operator) external onlyOwner {
+    function addOperator(address operator) external onlyOwner {
         allowedOperators[operator] = true;
     }
 
@@ -138,26 +138,76 @@ contract QuestionTemplateManager {
 
 
     // --- Create Question ---
-    function createQuestion(
-        uint256 templateId,
-        string[] memory variableNames,
-        string[] memory variableValues
-    ) public  onlyAllowedOperator returns (uint256) {
-        require(variableNames.length == variableValues.length, "Length mismatch");
+    // function createQuestion(
+    //     uint256 templateId,
+    //     string[] memory variableNames,
+    //     string[] memory variableValues
+    // ) public  onlyAllowedOperator returns (uint256) {
+    //     require(variableNames.length == variableValues.length, "Length mismatch");
 
-        questionCounter++;
-        Question storage q = questions[questionCounter];
-        q.id = questionCounter;
-        q.templateId = templateId;
-        q.exists = true;
+    //     questionCounter++;
+    //     Question storage q = questions[questionCounter];
+    //     q.id = questionCounter;
+    //     q.templateId = templateId;
+    //     q.exists = true;
+
+    //     for (uint256 i = 0; i < variableNames.length; i++) {
+    //         q.answers[variableNames[i]] = variableValues[i];
+    //     }
+
+    //     emit QuestionCreated(questionCounter, templateId);
+    //     return questionCounter;
+    // }
+
+    function createQuestion(
+    uint256 templateId,
+    string[] memory variableNames,
+    string[] memory variableValues
+) public onlyAllowedOperator returns (uint256) {
+    require(variableNames.length == variableValues.length, "Length mismatch");
+    require(templates[templateId].active, "Template not active");
+
+    Template storage tmpl = templates[templateId];
+    Question storage q = questions[++questionCounter];
+    q.id = questionCounter;
+    q.templateId = templateId;
+    q.exists = true;
 
         for (uint256 i = 0; i < variableNames.length; i++) {
-            q.answers[variableNames[i]] = variableValues[i];
+            string memory varName = variableNames[i];
+            string memory varValue = variableValues[i];
+            bool found = false;
+
+            for (uint256 j = 0; j < tmpl.variables.length; j++) {
+                Variable storage variable = tmpl.variables[j];
+                if (keccak256(bytes(variable.name)) == keccak256(bytes(varName))) {
+                    found = true;
+
+                    if (variable.paramType == ParamType.STRING && variable.options.length > 0) {
+                        bool isValidOption = false;
+                        for (uint256 k = 0; k < variable.options.length; k++) {
+                            if (keccak256(bytes(varValue)) == keccak256(bytes(variable.options[k]))) {
+                                isValidOption = true;
+                                break;
+                            }
+                        }
+                        require(isValidOption, string(abi.encodePacked("Invalid value for variable: ", varName)));
+                    }
+
+                    // Future type checks (FLOAT, DATE) can go here
+
+                    break;
+                }
+            }
+
+            require(found, string(abi.encodePacked("Variable name not found in template: ", varName)));
+            q.answers[varName] = varValue;
         }
 
         emit QuestionCreated(questionCounter, templateId);
         return questionCounter;
     }
+
 
     // --- Get Variable Details for a Template ---
     function getVariables(uint256 templateId) public view returns (Variable[] memory) {
