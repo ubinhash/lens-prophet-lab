@@ -5,9 +5,9 @@ interface IQuestionTemplateManager {
     function createQuestion(uint256 templateId, string[] calldata params) external returns (uint256);
 }
 
-
 contract PredictionManager {
     enum Resolution { UNRESOLVED, WIN, LOSS, INVALIDATED }
+    enum ClaimType { WINNING,REFUND,FEE }
 
     struct Prediction {
         uint256 postId;
@@ -27,8 +27,10 @@ contract PredictionManager {
     mapping(uint256 => mapping(address => uint256)) public challenges;
     mapping(uint256 => address[]) public challengerList;
     mapping(uint256 => mapping(address => bool)) public hasChallenged;
-    mapping(uint256 => mapping(address => uint256)) public prizeClaims;
-    mapping(uint256 => mapping(address => bool)) public prizeClaimed;
+
+    mapping(address => uint256) public balances;
+    mapping(uint256 => mapping(address => uint256)) public claims; //predid -> address->win amount
+
     IQuestionTemplateManager public templateManager;
 
     uint256 public globalMinChallenge = 0.001 ether;
@@ -40,20 +42,20 @@ contract PredictionManager {
     event PredictionCreated(uint256 indexed id, uint256 postId, uint256 questionId, address sender, uint256 stake);
     event PredictionChallenged(uint256 indexed id, address challenger, uint256 amount);
     event PredictionResolved(uint256 indexed id, Resolution resolution);
-    event PrizeClaimed(uint256 indexed id, address user, uint256 amount);
+    event Claimed(address user, uint256 amount);
+    event NewClaim(address user, uint256 predictionId, uint256 amount,ClaimType claimtype );
 
-  
     constructor() {
         owner = msg.sender;
         feeCollector = msg.sender;
     }
+
     modifier onlyOwner() {
-    require(msg.sender == owner, "Not owner");
-    _;
-}
+        require(msg.sender == owner, "Not owner");
+        _;
+    }
 
-
-function createPrediction(
+    function createPrediction(
         uint256 postId,
         uint256 templateId,
         string[] calldata templateParams,
@@ -102,7 +104,7 @@ function createPrediction(
         emit PredictionChallenged(predictionId, msg.sender, msg.value);
     }
 
-    function resolvePrediction(uint256 predictionId, Resolution res) external {
+    function resolvePrediction(uint256 predictionId, Resolution res) external onlyOwner {
         Prediction storage pred = predictions[predictionId];
         require(pred.resolution == Resolution.UNRESOLVED, "Already resolved");
         pred.resolution = res;
@@ -110,39 +112,34 @@ function createPrediction(
         if (res == Resolution.INVALIDATED) {
             uint256 fee = (pred.initialStake * feePercent) / 100;
             uint256 refund = pred.initialStake - fee;
-            prizeClaims[predictionId][feeCollector] += fee;
+            balances[feeCollector] += fee;
             _refundChallengers(predictionId);
-            prizeClaims[predictionId][pred.sender] += refund;
+            balances[pred.sender] += refund;
+            claims[predictionId][pred.sender]+=refund;
+            emit NewClaim(pred.sender,predictionId,refund,ClaimType.REFUND);
         } else if (res == Resolution.WIN) {
             uint256 fee = (pred.totalChallenged * feePercent) / 100;
             uint256 reward = pred.totalChallenged - fee;
-            prizeClaims[predictionId][feeCollector] += fee;
-            prizeClaims[predictionId][pred.sender] += pred.initialStake + reward;
+            balances[feeCollector] += fee;
+            balances[pred.sender] += pred.initialStake + reward;
+            claims[predictionId][pred.sender]+=pred.initialStake + reward;
+            emit NewClaim(pred.sender,predictionId,pred.initialStake + reward,ClaimType.WINNING);
         } else if (res == Resolution.LOSS) {
             uint256 fee = (pred.initialStake * feePercent) / 100;
             uint256 reward = pred.initialStake - fee;
-            prizeClaims[predictionId][feeCollector] += fee;
+            balances[feeCollector] += fee;
 
             address[] memory challengers = challengerList[predictionId];
             for (uint256 i = 0; i < challengers.length; i++) {
                 address challenger = challengers[i];
                 uint256 stake = challenges[predictionId][challenger];
                 uint256 share = (stake * reward) / pred.totalChallenged;
-                prizeClaims[predictionId][challenger] += stake + share;
+                balances[challenger] += stake + share;
+                emit NewClaim(challenger,predictionId,stake + share,ClaimType.WINNING);
             }
         }
 
         emit PredictionResolved(predictionId, res);
-    }
-
-    function claimPrize(uint256 predictionId) external {
-        uint256 amount = prizeClaims[predictionId][msg.sender];
-        require(amount > 0, "Nothing to claim");
-        require(!prizeClaimed[predictionId][msg.sender]);
-        prizeClaimed[predictionId][msg.sender]=true;
-        (bool success, ) = payable(msg.sender).call{value: amount}("");
-        require(success, "Transfer failed");
-        emit PrizeClaimed(predictionId, msg.sender, amount);
     }
 
     function _refundChallengers(uint256 predictionId) internal {
@@ -150,8 +147,19 @@ function createPrediction(
         for (uint256 i = 0; i < challengers.length; i++) {
             address challenger = challengers[i];
             uint256 stake = challenges[predictionId][challenger];
-            prizeClaims[predictionId][challenger] += stake;
+            balances[challenger] += stake;
+            claims[predictionId][challenger]=stake;
+            emit NewClaim(challenger,predictionId,stake,ClaimType.REFUND);
         }
+    }
+
+    function claim() external {
+        uint256 amount = balances[msg.sender];
+        require(amount > 0, "Nothing to claim");
+        balances[msg.sender] = 0;
+        (bool success, ) = payable(msg.sender).call{value: amount}("");
+        require(success, "Transfer failed");
+        emit Claimed(msg.sender, amount);
     }
 
     function getChallengers(uint256 predictionId) external view returns (address[] memory) {
@@ -166,5 +174,14 @@ function createPrediction(
     function updateFeeCollector(address newFeeCollector) external onlyOwner {
         require(newFeeCollector != address(0), "Invalid address");
         feeCollector = newFeeCollector;
+    }
+    function updateChallengeDeadline(uint256 predictionId, uint256 newDeadline) external {
+        Prediction storage pred = predictions[predictionId];
+        require(msg.sender == pred.sender, "Not prediction creator");
+        require(pred.resolution == Resolution.UNRESOLVED, "Already resolved");
+        require(newDeadline < pred.challengeDeadline, "Can only shorten deadline");
+        require(newDeadline > block.timestamp, "Deadline must be in future");
+
+        pred.challengeDeadline = newDeadline;
     }
 }
