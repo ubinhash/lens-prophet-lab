@@ -33,3 +33,36 @@ dataSources:
         - event: VariableAdded(indexed uint256,string)
           handler: handleVariableAdded
       file: ./src/question-template-manager.ts
+  - kind: ethereum
+    name: PredictionManager
+    network: lens-testnet
+    source:
+      address: "0xD9882F7f91498e94a6cb1A8f0bE843b4b9C8A782"
+      abi: PredictionManager
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Claimed
+        - NewClaim
+        - PredictionChallenged
+        - PredictionCreated
+        - PredictionResolved
+      abis:
+        - name: PredictionManager
+          file: ./abis/PredictionManager.json
+      eventHandlers:
+        - event: Claimed(address,uint256)
+          handler: handleClaimed
+        - event: NewClaim(address,uint256,uint256,uint8)
+          handler: handleNewClaim
+        - event: PredictionChallenged(indexed uint256,address,uint256)
+          handler: handlePredictionChallenged
+        - event: PredictionCreated(indexed uint256,uint256,uint256,address,uint256,string,uint256,uint256)
+          handler: handlePredictionCreated
+        - event: PredictionResolved(indexed uint256,uint8)
+          handler: handlePredictionResolved
+      file: ./src/prediction-manager.ts
+
