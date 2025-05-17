@@ -35,6 +35,11 @@ contract PredictionManager {
     mapping(address => uint256) public balances;
     mapping(uint256 => mapping(address => uint256)) public claims; //predid -> address->win amount
 
+    mapping(address => bool) public allowedOperators;
+    
+
+
+
     IQuestionTemplateManager public templateManager;
 
     uint256 public globalMinChallenge = 0.001 ether;
@@ -51,14 +56,15 @@ contract PredictionManager {
         uint256 stake,
         string questionText,
         uint256 minChallengeStake,
-        uint256 maxChallengeStake
+        uint256 maxChallengeStake,
+        uint256 challengeDeadline
     );
 
     event PredictionChallenged(uint256 indexed id, address challenger, uint256 amount);
     event PredictionResolved(uint256 indexed id, Resolution resolution);
     event Claimed(address user, uint256 amount);
     event NewClaim(address user, uint256 predictionId, uint256 amount,ClaimType claimtype );
-
+    event challengeDeadlineChanged(uint256 predictionId,uint256 challengeDeadline);
     constructor() {
         owner = msg.sender;
         feeCollector = msg.sender;
@@ -67,6 +73,18 @@ contract PredictionManager {
     modifier onlyOwner() {
         require(msg.sender == owner, "Not owner");
         _;
+    }
+    modifier onlyAllowedOperator() {
+        require(allowedOperators[msg.sender], "Not an allowed operator");
+        _;
+    }
+
+    function addOperator(address operator) external onlyOwner {
+        allowedOperators[operator] = true;
+    }
+
+    function removeOperator(address operator) external onlyOwner {
+        allowedOperators[operator] = false;
     }
 
     function createPrediction(
@@ -98,7 +116,7 @@ contract PredictionManager {
             resolution: Resolution.UNRESOLVED
         });
 
-        emit PredictionCreated(predictionCounter, postId, questionId, msg.sender, msg.value,questionText,minChallengeStake,maxChallengeStake);
+        emit PredictionCreated(predictionCounter, postId, questionId, msg.sender, msg.value,questionText,minChallengeStake,maxChallengeStake,block.timestamp + challengeDuration);
         return predictionCounter;
     }
 
@@ -119,7 +137,7 @@ contract PredictionManager {
         emit PredictionChallenged(predictionId, msg.sender, msg.value);
     }
 
-    function resolvePrediction(uint256 predictionId, Resolution res) external onlyOwner {
+    function resolvePrediction(uint256 predictionId, Resolution res) external onlyAllowedOperator {
         Prediction storage pred = predictions[predictionId];
         require(pred.resolution == Resolution.UNRESOLVED, "Already resolved");
         pred.resolution = res;
@@ -202,7 +220,9 @@ contract PredictionManager {
         require(newDeadline < pred.challengeDeadline, "Can only shorten deadline");
         require(newDeadline > block.timestamp, "Deadline must be in future");
 
+
         pred.challengeDeadline = newDeadline;
+        emit challengeDeadlineChanged(predictionId,newDeadline);
     }
     function updateConfig(
         uint256 _globalMinChallenge,

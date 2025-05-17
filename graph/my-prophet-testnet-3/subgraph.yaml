@@ -37,7 +37,7 @@ dataSources:
     name: PredictionManager
     network: lens-testnet
     source:
-      address: "0xD9882F7f91498e94a6cb1A8f0bE843b4b9C8A782"
+      address: "0xe54D5304E13A7Ca30c1323e755f7e754E94c71f7"
       abi: PredictionManager
       startBlock: 3613900
     mapping:

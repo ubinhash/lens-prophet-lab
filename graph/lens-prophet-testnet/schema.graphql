@@ -7,8 +7,8 @@ type QuestionCreated @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type TemplateActivated @entity(immutable: true) {
-  id: Bytes!
+type TemplateActivated @entity(immutable: false) {
+  id: ID! 
   QuestionTemplateManager_id: BigInt! # uint256
   activated: Boolean! # bool
   blockNumber: BigInt!
@@ -16,14 +16,15 @@ type TemplateActivated @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type TemplateCreated @entity(immutable: true) {
-  id: Bytes!
+type TemplateCreated @entity(immutable: false) {
+  id: ID!
   QuestionTemplateManager_id: BigInt! # uint256
-  templateText: String!
-  category: String!
+  templateText: String! # string
+  category: String! # string
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  activated: Boolean!
 }
 
 type VariableAdded @entity(immutable: true) {
@@ -34,6 +35,7 @@ type VariableAdded @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
 
 type Claimed @entity {
   id: ID!
@@ -88,4 +90,3 @@ type PredictionResolved @entity {
   timestamp: BigInt!
   transactionHash: Bytes!
 }
-

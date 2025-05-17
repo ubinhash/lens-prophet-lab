@@ -52,7 +52,8 @@ export function handlePredictionChallenged(event: PredictionChallengedEvent): vo
 }
 
 export function handlePredictionCreated(event: PredictionCreatedEvent): void {
-  let id = event.transaction.hash.toHex() + '-' + event.logIndex.toString()
+  //let id = event.transaction.hash.toHex() + '-' + event.logIndex.toString()
+  let id =  event.parameters[0].value.toBigInt().toString() //use prediction id as id
   let entity = new PredictionCreated(id)
   entity.predictionId = event.parameters[0].value.toBigInt()
   entity.postId = event.params.postId
@@ -65,6 +66,7 @@ export function handlePredictionCreated(event: PredictionCreatedEvent): void {
   entity.blockNumber = event.block.number
   entity.timestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
+  entity.resolution=0;
   entity.save()
 }
 
@@ -77,4 +79,11 @@ export function handlePredictionResolved(event: PredictionResolvedEvent): void {
   entity.timestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
   entity.save()
+
+  let predid=event.parameters[0].value.toBigInt().toString()
+   let entity2 = PredictionCreated.load(predid);
+    if (entity2 != null) {
+      entity2.resolution = event.params.resolution;
+      entity2.save();
+    }
 }

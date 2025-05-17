@@ -80,6 +80,7 @@ type PredictionCreated @entity {
   blockNumber: BigInt!
   timestamp: BigInt!
   transactionHash: Bytes!
+  resolution: Int!
 }
 
 type PredictionResolved @entity {

@@ -65,6 +65,7 @@ export function handlePredictionCreated(event: PredictionCreatedEvent): void {
   entity.blockNumber = event.block.number
   entity.timestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
+  entity.resolution = 0
   entity.save()
 }
 
