@@ -8,7 +8,7 @@ type QuestionCreated @entity(immutable: true) {
 }
 
 type TemplateActivated @entity(immutable: false) {
-  id: Bytes!
+  id: ID! 
   QuestionTemplateManager_id: BigInt! # uint256
   activated: Boolean! # bool
   blockNumber: BigInt!
@@ -17,7 +17,7 @@ type TemplateActivated @entity(immutable: false) {
 }
 
 type TemplateCreated @entity(immutable: false) {
-  id: Bytes!
+  id: ID!
   QuestionTemplateManager_id: BigInt! # uint256
   templateText: String! # string
   category: String! # string

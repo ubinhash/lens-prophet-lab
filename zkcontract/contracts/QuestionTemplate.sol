@@ -218,6 +218,17 @@ contract QuestionTemplateManager {
         return templates[templateId].variables;
     }
 
+    function getVariableByName(uint256 templateId, string memory varName) public view returns (Variable memory) {
+        Variable[] memory vars = templates[templateId].variables;
+        for (uint i = 0; i < vars.length; i++) {
+            if (keccak256(bytes(vars[i].name)) == keccak256(bytes(varName))) {
+                return vars[i];
+            }
+        }
+        revert("Variable not found");
+    }
+
+
     // --- Deactivate Template ---
     function changeTemplateActivation(uint256 templateId,bool activated) external onlyOwner{
         templates[templateId].active = activated;

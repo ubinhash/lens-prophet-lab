@@ -42,7 +42,7 @@ export function handleQuestionCreated(event: QuestionCreatedEvent): void {
 
 
 export function handleTemplateActivated(event: TemplateActivatedEvent): void {
-  let id = Bytes.fromHexString(event.params.id.toHexString()) as Bytes;
+  let id =  event.params.id.toString();
 
   let entity = TemplateActivated.load(id);
   if (entity == null) {
@@ -81,7 +81,7 @@ export function handleTemplateActivated(event: TemplateActivatedEvent): void {
 // }
 
 export function handleTemplateCreated(event: TemplateCreatedEvent): void {
-  let id = Bytes.fromHexString(event.params.id.toHexString()) as Bytes;
+  let id =  event.params.id.toString();
 
   // Try loading existing entity or create new
   let entity = TemplateCreated.load(id);

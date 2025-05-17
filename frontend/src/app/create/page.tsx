@@ -11,16 +11,232 @@ import { getLensClient } from "@/lib/lens/client";
 import { evmAddress } from "@lens-protocol/client";
 import { env } from "process";
 
+import predictionABI from '../../abi/prediction-abi.js';
+import questionABI from '../../abi/question-abi.js';
+import { useContractRead } from 'wagmi'
+
+function VariablesList({ templateId }: { templateId: number }) {
+  const { data, isError, isLoading } = useContractRead({
+    address: process.env.NEXT_PUBLIC_QUESTION_CONTRACT,
+    abi: questionABI,
+    functionName: 'getVariables',
+    args: [templateId],
+  })
+
+  if (isLoading) return <div>Loading variables...</div>
+  if (isError) return <div>Error fetching variables</div>
+
+  // `data` is an array of Variable objects with { name, paramType, options }
+  const variables = data ?? []
+
+  // Build a map: name -> { paramType, options }
+  const variableMap = variables.reduce<Record<string, { paramType: number; options: string[] }>>((acc, v) => {
+    acc[v.name] = { paramType: v.paramType, options: v.options }
+    return acc
+  }, {})
+
+  return (
+    <div>
+      <h3>Variables for Template {templateId}</h3>
+      <ul>
+        {variables.length === 0 && <li>No variables found</li>}
+        {variables.map((v: any, i: number) => (
+          <li key={i}>
+            <b>{v.name}</b> - Type: {v.paramType} - Options: {v.options.length ? v.options.join(', ') : 'None'}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 const PostCreator = () => {
   // const { address } = useAccount();
   const [content, setContent] = useState("");
   const [posting, setPosting] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
+  type QuestionTemplate = {
+    id: string;
+    templateText: string;
+    category: string;
+  };
+  
+
+  const [questionTemplates, setQuestionTemplates] = useState<QuestionTemplate[]>([]);
+  const [selectedId, setSelectedId] = useState<string>("");
+  const selectedtemplateText = questionTemplates.find(q => q.id === selectedId)?.templateText ?? "";
+
+  const [values, setValues] = useState<Record<string, string>>({});
+  const variableNames = Object.keys(values);
+  const variableValues = Object.values(values);
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedId(e.target.value);
+    setValues({});
+
+  };
+
 
   const [sessionClient, setSessionClient] = useState<any>(null);
 
   const { data: walletClient } = useWalletClient();
+
+    useEffect(() => {
+      const fetchQuestions = async () => {
+        try {
+          console.log("hi")
+          const res = await fetch('https://api.studio.thegraph.com/query/111655/my-prophet-testnet-3/version/latest', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer YOUR_API_KEY', // replace with your actual key
+            },
+            body: JSON.stringify({
+              query: `
+                {
+                  templateCreateds(first: 5 , where: { activated: true }) {
+                    id
+                    templateText
+                    category
+                  }
+                }
+              `,
+              operationName: 'Subgraphs',
+              variables: {}
+            }),
+          });
+  
+          const json = await res.json();
+          if (json.data) {
+            setQuestionTemplates(json.data.templateCreateds);
+            console.log(json.data.templateCreateds)
+          } else {
+            setError('Failed to fetch questions.');
+          }
+        } catch (err) {
+          console.error(err);
+          setError('An error occurred while fetching data.');
+        } finally {
+
+        }
+      };
+  
+      fetchQuestions();
+    }, []);
+
+    const parseTemplate = (template: string) => {
+      const regex = /\[([^\]]+)\]/g;
+      const parts: (string | { variable: string })[] = [];
+    
+      let lastIndex = 0;
+      let match: RegExpExecArray | null;
+    
+      while ((match = regex.exec(template)) !== null) {
+        if (match.index > lastIndex) {
+          parts.push(template.slice(lastIndex, match.index)); // static text
+        }
+        parts.push({ variable: match[1] }); // variable name without brackets
+        lastIndex = regex.lastIndex;
+      }
+    
+      if (lastIndex < template.length) {
+        parts.push(template.slice(lastIndex)); // remaining text
+      }
+    
+      return parts;
+    };
+
+    
+    const FillInTheBlank = ({ templateText, selectedId }: { templateText: string; selectedId: string }) => {
+      // const [values, setValues] = useState<Record<string, string>>({});
+      
+    
+      const { data: variablesData, isLoading } = useContractRead({
+        address: process.env.NEXT_PUBLIC_QUESTION_CONTRACT,
+        abi: questionABI,
+        functionName: 'getVariables',
+        args: [parseInt(selectedId)],
+      });
+    
+      // Create map: variableName -> { paramType, options }
+      const variableMap: Record<string, { paramType: number; options: string[] }> = {};
+      (variablesData || []).forEach((v: any) => {
+        variableMap[v.name] = { paramType: v.paramType, options: v.options };
+      });
+    
+      const parsed = parseTemplate(templateText);
+    
+      const handleChange = (variable: string, value: string) => {
+        setValues(prev => ({ ...prev, [variable]: value }));
+      };
+    
+      if (isLoading) return <div>Loading variables...</div>;
+    
+      return (
+        <div>
+          {parsed.map((part, index) =>
+            typeof part === 'string' ? (
+              <span key={index}>{part}</span>
+            ) : (
+              <span key={index} style={{ margin: '0 4px' }}>
+                {(() => {
+                  const { paramType, options } = variableMap[part.variable] || {};
+    
+                  // Dropdown if STRING with options
+                  if (paramType === 0 && options?.length) {
+                    return (
+                      <select
+                        value={values[part.variable] || ''}
+                        onChange={e => handleChange(part.variable, e.target.value)}
+                      >
+                        <option value="">Select {part.variable}</option>
+                        {options.map(opt => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                      </select>
+                    );
+                  }
+    
+                  // Date selector if TIMESTAMP
+                  if (paramType === 2) {
+                    return (
+                      <input
+                        type="date"
+                        value={
+                          values[part.variable]
+                            ? new Date(parseInt(values[part.variable]) * 1000)
+                                .toISOString()
+                                .split('T')[0]
+                            : ''
+                        }
+                        onChange={e => {
+                          const unixTimestamp = Math.floor(
+                            new Date(e.target.value).getTime() / 1000
+                          );
+                          handleChange(part.variable, unixTimestamp.toString());
+                        }}
+                      />
+                    );
+                  }
+    
+                  // Fallback to text input
+                  return (
+                    <input
+                      placeholder={part.variable}
+                      value={values[part.variable] || ''}
+                      onChange={e => handleChange(part.variable, e.target.value)}
+                    />
+                  );
+                })()}
+              </span>
+            )
+          )}
+        </div>
+      );
+    };
 
   useEffect(() => {
     const init = async () => {
@@ -65,7 +281,6 @@ const PostCreator = () => {
       
       
       const txHash = result.value as string;
-      console.log(result)
       addQuestion(txHash);
       setStatus("success");
       setContent("");
@@ -83,14 +298,22 @@ const PostCreator = () => {
       if(!walletClient){
         return;
       }
-      const contractAbi=[{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"sender","type":"address"},{"indexed":false,"internalType":"bytes32","name":"postId","type":"bytes32"},{"indexed":false,"internalType":"string","name":"question","type":"string"},{"indexed":false,"internalType":"uint256","name":"amountSent","type":"uint256"}],"name":"QuestionCreated","type":"event"},{"inputs":[{"internalType":"bytes32","name":"postId","type":"bytes32"},{"internalType":"string","name":"question","type":"string"}],"name":"createQuestion","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"questions","outputs":[{"internalType":"bytes32","name":"postId","type":"bytes32"},{"internalType":"string","name":"question","type":"string"},{"internalType":"address","name":"sender","type":"address"},{"internalType":"uint256","name":"amountSent","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}]
-      const hash = await walletClient.writeContract({
-        address: "0x48d5C7801658b29e413F343B5998c733662b24c4",
+      const contractAbi=predictionABI;
+    // const variableNames = ["Person"];
+    // const variableValues = ["Person B"];
+    console.log(variableNames,variableValues)
+    const questionText="Testing Question Creation?";
+    // const templateId=1
+    
+       const hash = await walletClient.writeContract({
+        address: "0xD9882F7f91498e94a6cb1A8f0bE843b4b9C8A782",
         abi: contractAbi,
-        functionName: "createQuestion",
-        args: [postTx, "What is Lens Protocol?"],
-        value: BigInt(0.0001 * 1e18), // example for sending 0.01 ETH
+        functionName: "createPrediction",
+        args: [postTx, selectedId,variableNames,variableValues,questionText,BigInt(0.001 * 1e18),BigInt(0.002 * 1e18),100000],
+        value: BigInt(0.01 * 1e18), // example for sending 0.01 ETH
       });
+      
+      
     }
     catch (err: any) {
       console.log(err);
@@ -99,6 +322,18 @@ const PostCreator = () => {
 
   return (
     <div className="p-4 border rounded shadow max-w-md mx-auto">
+      
+      <label htmlFor="question-select">Select a question template:</label>
+      <select id="question-select" value={selectedId} onChange={handleChange}>
+        <option value="">-- Choose a question --</option>
+        {questionTemplates.map((template) => (
+          <option key={template.id} value={template.id}>
+            {template.templateText}
+          </option>
+        ))}
+      </select>
+      <FillInTheBlank templateText={selectedtemplateText} selectedId={selectedId}/>
+   
       <textarea
         className="w-full p-2 border rounded mb-2"
         rows={4}
