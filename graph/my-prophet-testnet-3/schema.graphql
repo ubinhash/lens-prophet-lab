@@ -81,6 +81,8 @@ type PredictionCreated @entity {
   timestamp: BigInt!
   transactionHash: Bytes!
   resolution: Int!
+  challengeDeadline: BigInt!
+
 }
 
 type PredictionResolved @entity {
@@ -90,5 +92,15 @@ type PredictionResolved @entity {
   blockNumber: BigInt!
   timestamp: BigInt!
   transactionHash: Bytes!
+}
+
+type ChallengeDeadlineChanged @entity{
+  id: ID!
+  predictionId: BigInt!
+  challengeDeadline: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  transactionHash: Bytes!
+
 }
 

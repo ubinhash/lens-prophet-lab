@@ -4,7 +4,8 @@ import { getLensClient } from "@/lib/lens/client";
 import { fetchAccount } from "@lens-protocol/client/actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
+import PredictionCard from "./prediction-card";
+import styles from './page.module.css';
 /**
  * Fetches authenticated user account if logged in
  */
@@ -38,7 +39,7 @@ export default async function Home() {
 
 
   return (
-    <div className="flex flex-col lg:flex-row justify-between p-8">
+    <div className={`flex flex-col lg:flex-row justify-between p-8 ${styles.minHeightCenter}`}>
     {/* Left Side: Main Text Content */}
     <div className="max-w-xl flex flex-col h-120">
         <h1 className="text-6xl font-bold">
@@ -74,7 +75,7 @@ export default async function Home() {
     {/* Right Side: Placeholder Cards */}
     <div className="flex flex-col space-y-6 mt-12 lg:mt-0 lg:ml-8 ">
       <div className="w-80 h-60 bg-green-100 rounded shadow-md"></div>
-      <div className="w-80 h-60 bg-rose-100 rounded shadow-md"></div>
+      <div className="w-80 h-60 bg-rose-100 rounded shadow-md"><PredictionCard></PredictionCard></div>
     </div>
   </div>
   

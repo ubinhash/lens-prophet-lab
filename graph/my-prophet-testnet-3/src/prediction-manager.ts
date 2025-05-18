@@ -4,7 +4,8 @@ import {
   NewClaim as NewClaimEvent,
   PredictionChallenged as PredictionChallengedEvent,
   PredictionCreated as PredictionCreatedEvent,
-  PredictionResolved as PredictionResolvedEvent
+  PredictionResolved as PredictionResolvedEvent,
+  challengeDeadlineChanged as challengeDeadlineChangedEvent
 } from "../generated/PredictionManager/PredictionManager"
 
 import {
@@ -12,7 +13,8 @@ import {
   NewClaim,
   PredictionChallenged,
   PredictionCreated,
-  PredictionResolved
+  PredictionResolved,
+  ChallengeDeadlineChanged
 } from "../generated/schema"
 
 export function handleClaimed(event: ClaimedEvent): void {
@@ -63,6 +65,7 @@ export function handlePredictionCreated(event: PredictionCreatedEvent): void {
   entity.questionText = event.params.questionText;
   entity.minChallengeStake = event.params.minChallengeStake;
   entity.maxChallengeStake = event.params.maxChallengeStake;
+  entity.challengeDeadline=event.params.challengeDeadline;
   entity.blockNumber = event.block.number
   entity.timestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
@@ -84,6 +87,24 @@ export function handlePredictionResolved(event: PredictionResolvedEvent): void {
    let entity2 = PredictionCreated.load(predid);
     if (entity2 != null) {
       entity2.resolution = event.params.resolution;
+      entity2.save();
+    }
+}
+
+export function handleChallengeDeadlineChanged(event: challengeDeadlineChangedEvent): void {
+  let id = event.transaction.hash.toHex() + '-' + event.logIndex.toString()
+  let entity = new ChallengeDeadlineChanged(id)
+  entity.predictionId =event.parameters[0].value.toBigInt()
+  entity.challengeDeadline = event.params.challengeDeadline;
+  entity.blockNumber = event.block.number
+  entity.timestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+  entity.save()
+
+  let predid=event.parameters[0].value.toBigInt().toString()
+   let entity2 = PredictionCreated.load(predid);
+    if (entity2 != null) {
+      entity2.challengeDeadline = event.params.challengeDeadline;
       entity2.save();
     }
 }

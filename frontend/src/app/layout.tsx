@@ -35,14 +35,14 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
               <h1 className="text-xl font-bold">Lens Prophet Lab</h1>
               </Link>
               {/* Centered Links Container */}
-              <div className="absolute left-1/2 transform -translate-x-1/2 flex gap-6">
+              <div className="hidden md:flex  absolute left-1/2 transform -translate-x-1/2 flex gap-6" >
                 <Link href="/create" className="text-primary hover:underline">
                   Create Prediction
                 </Link>
-                <Link href="/discover" target="_blank" className="text-primary hover:underline">
+                <Link href="/discover"  className="text-primary hover:underline">
                   Discover
                 </Link>
-                <Link href="/leaderboard" target="_blank" className="text-primary hover:underline">
+                <Link href="/leaderboard" className="text-primary hover:underline">
                  Top Prophets
                 </Link>
               </div>
@@ -56,7 +56,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           </div>
 
             <main className="h-screen w-screen overflow-auto bg-background pt-16">
-              <div className="max-w-7xl mx-auto p-4">
+              <div className="max-w-7xl mx-auto pt-4">
                 {/* <div className="mb-8 pb-8 border-b">
                   <h2 className="text-2xl font-bold mb-4">Welcome to Lens Starter Template!</h2>
                   <p className="mb-4">

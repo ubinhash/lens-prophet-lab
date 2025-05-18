@@ -79,3 +79,5 @@ export function handlePredictionResolved(event: PredictionResolvedEvent): void {
   entity.transactionHash = event.transaction.hash
   entity.save()
 }
+
+

@@ -1,0 +1,103 @@
+.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* responsive layout */
+    gap: 1.5rem;
+    padding: 1rem;
+    max-width: 1200px;
+    margin: auto;
+  }
+  
+  .card {
+   
+
+    border: 2px solid #000000;
+    border-bottom: 4px solid black;
+    border-right: 4px solid black;
+    border-radius: 5px;
+    background-color: #fafff7;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+background-color:black;
+color:white;
+    font-weight: bold;
+    border-bottom: 1px solid #222;
+  }
+  
+  .body {
+    padding: 1rem;
+    text-align: center;
+  }
+  
+  .title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+  }
+  
+  .paragraph {
+    margin: 0.5rem 0;
+    color: #222;
+  }
+  
+  .challengeButton {
+    margin-top: 1rem;
+    padding: 0.5rem 1.25rem;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .challengeButton:hover {
+    background-color: #333;
+  }
+  
+  .footer {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: #444;
+  }
+  .description{
+    height:60px;
+  
+    padding:0px 10px;
+    border-radius: 5px;
+
+    overflow-y: scroll;
+  }
+  .username{
+    
+    background-color: rgb(255, 244, 239);
+    padding:5px;
+    border-radius: 5px;
+    
+    border-radius: grey;
+    text-align: right;
+    color:rgb(255, 128, 49);
+    border:1px solid  rgb(255, 128, 49) ;
+  }
+  .username_div{
+    /* margin-left:10px;
+    margin-bottom:10px; */
+    text-align: left;
+  }
+  .description_container{
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+
+    padding:10px;
+    border-radius: 0px;
+    
+  }
+  

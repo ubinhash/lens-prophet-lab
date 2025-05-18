@@ -1,0 +1,11 @@
+.minHeightCenter {
+    display: flex;
+  }
+  
+  @media (min-height: 1000px) {
+    .minHeightCenter {
+
+      justify-content: center;
+     margin-top: 10vh;
+    }
+  }

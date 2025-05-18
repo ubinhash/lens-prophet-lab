@@ -60,9 +60,11 @@ dataSources:
           handler: handleNewClaim
         - event: PredictionChallenged(indexed uint256,address,uint256)
           handler: handlePredictionChallenged
-        - event: PredictionCreated(indexed uint256,uint256,uint256,address,uint256,string,uint256,uint256)
+        - event: PredictionCreated(indexed uint256,uint256,uint256,address,uint256,string,uint256,uint256,uint256)
           handler: handlePredictionCreated
         - event: PredictionResolved(indexed uint256,uint8)
           handler: handlePredictionResolved
+        - event: challengeDeadlineChanged(uint256,uint256)
+          handler: handleChallengeDeadlineChanged
       file: ./src/prediction-manager.ts
 

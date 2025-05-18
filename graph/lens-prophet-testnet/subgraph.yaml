@@ -64,5 +64,7 @@ dataSources:
           handler: handlePredictionCreated
         - event: PredictionResolved(indexed uint256,uint8)
           handler: handlePredictionResolved
+        - event: challengeDeadlineChanged(uint256,uint256);
+          handler: handleChallengeDeadlineChanged
       file: ./src/prediction-manager.ts
 

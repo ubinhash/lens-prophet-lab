@@ -14,6 +14,9 @@ import { env } from "process";
 import predictionABI from '../../abi/prediction-abi.js';
 import questionABI from '../../abi/question-abi.js';
 import { useContractRead } from 'wagmi'
+import { max } from "date-fns";
+import styles from './page.module.css';
+import { useMemo } from 'react';
 
 function VariablesList({ templateId }: { templateId: number }) {
   const { data, isError, isLoading } = useContractRead({
@@ -70,10 +73,81 @@ const PostCreator = () => {
   const [values, setValues] = useState<Record<string, string>>({});
   const variableNames = Object.keys(values);
   const variableValues = Object.values(values);
+  const [questionText,setQuestionText]=useState("")
+  const [stake,setStake]=useState(0.01);
+  const [minstake,setMinStake]=useState(0.01);
+  const [maxstake,setMaxStake]=useState(0.02);
+  const [confidence, setConfidence] = useState(6);
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+
+  const [stakeerror, setStakeError] = useState('');
+  const [minstakeerror, setMinStakeError] = useState('');
+  const [durationDays, setDurationDays] = useState(10);
+  const [durationHours, setDurationHours] = useState(0);
+  const challengeDurationSeconds = durationDays * 86400 + durationHours * 3600;
+
+  const handleDurationDay = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value)) {
+      const clamped = Math.max(0, Math.min(365, value));
+      setDurationDays(clamped);
+    }
+  };
+  
+  const handleDurationHour = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value)) {
+      const clamped = Math.max(0, Math.min(23, value));
+      setDurationHours(clamped);
+    }
+  };
+
+  const handleSetStake = (e) => {
+    const value = e.target.value;
+    setStake(value);
+  
+    const parsed = parseFloat(value);
+    if (value === "") {
+      setStakeError("");
+    } else if (isNaN(parsed)) {
+      setStakeError("Please enter a valid number");
+    } else if (parsed < 0.01) {
+      setStakeError("Stake must be at least 0.01");
+    } else {
+      setStakeError("");
+    }
+  };
+
+  const handleSetMinStake = (e) => {
+    const value = e.target.value;
+    setMinStake(value);
+  
+    const parsed = parseFloat(value);
+    if (value === "") {
+      setMinStakeError("");
+    } else if (isNaN(parsed)) {
+      setMinStakeError("Please enter a valid number");
+    } else if (parsed < 0.001) {
+      setMinStakeError("Min Challenge Stake must be at least 0.001");
+    } else {
+      setMinStakeError("");
+    }
+  };
+
+  useEffect(() => {
+    const calculatedMin = Number(((stake * (11-confidence)) / 5).toFixed(4));
+    const calculatedMax = Number((calculatedMin * 2).toFixed(4));
+
+    setMinStake(calculatedMin);
+    setMaxStake(calculatedMax);
+  }, [confidence,stake]);
+
+
+
+  const handleChangeTemplate = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedId(e.target.value);
     setValues({});
+    console.log("hi")
 
   };
 
@@ -151,13 +225,16 @@ const PostCreator = () => {
     const FillInTheBlank = ({ templateText, selectedId }: { templateText: string; selectedId: string }) => {
       // const [values, setValues] = useState<Record<string, string>>({});
       
-    
+      if(selectedId=="0" || templateText==""){
+        return <div></div>;
+      }
       const { data: variablesData, isLoading } = useContractRead({
         address: process.env.NEXT_PUBLIC_QUESTION_CONTRACT,
         abi: questionABI,
         functionName: 'getVariables',
         args: [parseInt(selectedId)],
       });
+      console.log(selectedId,"selected id")
     
       // Create map: variableName -> { paramType, options }
       const variableMap: Record<string, { paramType: number; options: string[] }> = {};
@@ -166,15 +243,42 @@ const PostCreator = () => {
       });
     
       const parsed = parseTemplate(templateText);
+      console.log("parse",parsed)
     
       const handleChange = (variable: string, value: string) => {
-        setValues(prev => ({ ...prev, [variable]: value }));
+        const updatedValues = { ...values, [variable]: value };
+        setValues(updatedValues);
+      
+        const filledString = parsed
+          .map(part => {
+            if (typeof part === 'string') return part;
+      
+            const val = updatedValues[part.variable];
+            if (!val) return `{${part.variable}}`;
+      
+            const isTimestamp = /^\d{10,}$/.test(val);
+            if (isTimestamp) {
+              const date = new Date(parseInt(val, 10) * 1000);
+              return date.toUTCString(); // e.g., "Sat, 17 May 2025 00:00:00 GMT"
+            }
+      
+            return val;
+          })
+          .join('');
+      
+        setQuestionText(filledString);
       };
+      
+
+      
+    
     
       if (isLoading) return <div>Loading variables...</div>;
     
       return (
         <div>
+  
+           <br></br>
           {parsed.map((part, index) =>
             typeof part === 'string' ? (
               <span key={index}>{part}</span>
@@ -189,6 +293,7 @@ const PostCreator = () => {
                       <select
                         value={values[part.variable] || ''}
                         onChange={e => handleChange(part.variable, e.target.value)}
+                        className={styles.inputvar}
                       >
                         <option value="">Select {part.variable}</option>
                         {options.map(opt => (
@@ -204,21 +309,22 @@ const PostCreator = () => {
                   if (paramType === 2) {
                     return (
                       <input
-                        type="date"
-                        value={
-                          values[part.variable]
-                            ? new Date(parseInt(values[part.variable]) * 1000)
-                                .toISOString()
-                                .split('T')[0]
-                            : ''
-                        }
-                        onChange={e => {
-                          const unixTimestamp = Math.floor(
-                            new Date(e.target.value).getTime() / 1000
-                          );
-                          handleChange(part.variable, unixTimestamp.toString());
-                        }}
-                      />
+                      type="datetime-local"
+                      className={styles.inputvar}
+                      value={
+                        values[part.variable]
+                          ? new Date(parseInt(values[part.variable]) * 1000)
+                              .toISOString()
+                              .slice(0, 16) // "YYYY-MM-DDTHH:mm"
+                          : ''
+                      }
+                      onChange={e => {
+                        const unixTimestamp = Math.floor(
+                          new Date(e.target.value).getTime() / 1000
+                        );
+                        handleChange(part.variable, unixTimestamp.toString());
+                      }}
+                    />
                     );
                   }
     
@@ -226,6 +332,7 @@ const PostCreator = () => {
                   return (
                     <input
                       placeholder={part.variable}
+                      className={styles.inputvar}
                       value={values[part.variable] || ''}
                       onChange={e => handleChange(part.variable, e.target.value)}
                     />
@@ -268,7 +375,31 @@ const PostCreator = () => {
 
     try {
       const metadata = textOnly({ content });
+
+      setSteps(prevSteps =>
+        prevSteps.map((step, i) =>
+          i === 1
+            ? { ...step, status: "pending", progressText: "uploading metadata..." }
+            : step
+        )
+      );
       const { uri: contentUri } = await storageClient.uploadAsJson(metadata);
+      
+      setSteps(prevSteps =>
+        prevSteps.map((step, i) =>
+          i === 0
+            ? { ...step, status: "success", progressText: `URI: ${contentUri}` }
+            : step
+        )
+      );
+
+      setSteps(prevSteps =>
+        prevSteps.map((step, i) =>
+          i === 1
+            ? { ...step, status: "pending", progressText: `posting feed...` }
+            : step
+        )
+      );
 
       console.log("uri",contentUri);
       if(!feed_address){
@@ -281,12 +412,31 @@ const PostCreator = () => {
       
       
       const txHash = result.value as string;
+
+      setSteps(prevSteps =>
+        prevSteps.map((step, i) =>
+          i === 1
+            ? { ...step, status: "success", progressText: `Tx: ${txHash}` }
+            : step
+        )
+      );
+      setSteps(prevSteps =>
+        prevSteps.map((step, i) =>
+          i === 2
+            ? { ...step, status: "pending", progressText: `Please confirm transaction in wallet` }
+            : step
+        )
+      );
+      
+
       addQuestion(txHash);
+      setFinalProgressText("Post Created Successfully")
       setStatus("success");
       setContent("");
     } catch (err: any) {
       console.error(err);
       setStatus("error");
+      setFinalProgressText("Something went wrong")
       setError(err.message || "Something went wrong");
     } finally {
       setPosting(false);
@@ -302,16 +452,24 @@ const PostCreator = () => {
     // const variableNames = ["Person"];
     // const variableValues = ["Person B"];
     console.log(variableNames,variableValues)
-    const questionText="Testing Question Creation?";
+
     // const templateId=1
     
        const hash = await walletClient.writeContract({
-        address: "0xD9882F7f91498e94a6cb1A8f0bE843b4b9C8A782",
+        address: process.env.NEXT_PUBLIC_PREDICTION_CONTRACT,
         abi: contractAbi,
         functionName: "createPrediction",
-        args: [postTx, selectedId,variableNames,variableValues,questionText,BigInt(0.001 * 1e18),BigInt(0.002 * 1e18),100000],
-        value: BigInt(0.01 * 1e18), // example for sending 0.01 ETH
+        args: [postTx, selectedId,variableNames,variableValues,questionText,BigInt(minstake * 1e18),BigInt(maxstake * 1e18),challengeDurationSeconds],
+        value: BigInt(stake * 1e18), // example for sending 0.01 ETH
       });
+
+      setSteps(prevSteps =>
+        prevSteps.map((step, i) =>
+          i === 2
+            ? { ...step, status: "success", progressText: `Tx ${hash}` }
+            : step
+        )
+      );
       
       
     }
@@ -320,36 +478,181 @@ const PostCreator = () => {
     }
   }
 
+  const [steps, setSteps] = useState([
+    {
+      label: "Upload prediction reasoning to Grove",
+      status: "default",
+      progressText: ""
+    },
+    {
+      label: "Posting Lens Feed",
+      status: "default",
+      progressText: ""
+    },
+    {
+      label: "Linking Feed and Create Prediction Transaction",
+      status: "default",
+      progressText: ""
+    }
+  ]);
+  
+  const [finalProgressText,setFinalProgressText] = useState("Please select From a template and create a prediction");
+  
+
+  // In your JSX:
+
+
   return (
-    <div className="p-4 border rounded shadow max-w-md mx-auto">
+    <div className={styles.container}>
       
-      <label htmlFor="question-select">Select a question template:</label>
-      <select id="question-select" value={selectedId} onChange={handleChange}>
-        <option value="">-- Choose a question --</option>
-        {questionTemplates.map((template) => (
-          <option key={template.id} value={template.id}>
-            {template.templateText}
-          </option>
-        ))}
-      </select>
-      <FillInTheBlank templateText={selectedtemplateText} selectedId={selectedId}/>
-   
-      <textarea
-        className="w-full p-2 border rounded mb-2"
-        rows={4}
-        placeholder="What's on your mind?"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        disabled={posting}
+      {/* <label htmlFor="question-select">Select a question template:</label> */}
+      <div className={styles.left_container}>
+        <div className={styles.title}>CREATE PREDICTION</div>
+        <select
+            className={styles.templateselect}
+            id="question-select"
+            value={selectedId}
+            onChange={handleChangeTemplate}
+          >
+          <option value="">-- Choose a question Template --</option>
+          {questionTemplates.map((template) => (
+            <option key={template.id} value={template.id}>
+              {template.templateText}
+            </option>
+          ))}
+        </select>
+        {/* {memoizedFillInTheBlank} */}
+        <FillInTheBlank templateText={selectedtemplateText} selectedId={selectedId}/>
+    
+        <textarea
+    className={styles.textarea}
+    rows={4}
+    placeholder="Explain your reasoning in detail. This portion will be a lens feed."
+    value={content}
+    onChange={(e) => setContent(e.target.value)}
+    disabled={posting}
+  />
+  <div>{questionText}</div>
+  <div className={styles.stake_container}>
+  <span className={styles.label}>Stake</span>
+  <input
+    type="number"
+    id="stake"
+    step="0.001"
+    min="0.01"
+    value={stake}
+    onChange={handleSetStake}
+    className={styles.input}
+  />
+  <span className={styles.unit}>GHO</span>
+</div>
+  {stakeerror && <p className={styles.error}>{stakeerror}</p>}
+
+  <div className={styles.label_slider}>Confidence: {confidence}/10</div>
+ 
+  <input
+    type="range"
+    min={1}
+    max={10}
+    value={confidence}
+    onChange={(e) => setConfidence(Number(e.target.value))}
+    className={styles.slider}
+  />
+  
+
+  <div className={styles.stakeInputsContainer}>
+  <div className={styles.inputBlock}>
+    <label className={styles.label}>Minimum Challenge Stake
+    <span className={styles.tooltipWrapper}>
+      ?
+      <span className={styles.tooltipText}>
+        People can stake GHO to challenge this prediction. If the challenge pool is less than this minimum, the challenge will abort.
+      </span>
+    </span>
+    </label>
+    <input
+      type="number"
+      value={minstake}
+      step="0.001"
+      min="0.001"
+      onChange={handleSetMinStake}
+      className={styles.input}
+    />
+    {minstakeerror && <p className={styles.error}>{minstakeerror}</p>}
+  </div>
+
+  <div className={styles.inputBlock}>
+    <label className={styles.label}>Maximum Challenge Stake</label>
+    <input
+      type="number"
+      value={maxstake}
+      step="0.001"
+      onChange={(e) => setMaxStake(Number(e.target.value))}
+      className={styles.input}
+    />
+  </div>
+</div>
+<div className={styles.durationContainer}>
+  <label className={styles.label}>Challenge Deadline</label>
+  <div className={styles.durationInputs}>
+    <div className={styles.durationInput}>
+      <input
+        type="number"
+        value={durationDays}
+        onChange={handleDurationDay}
+        min={0}
+        max={365}
+        className={styles.input2}
       />
-   
-      <button
-        className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50"
-        onClick={handlePost}
-        disabled={posting || !content.trim()}
-      >
-        {posting ? "Posting..." : "Post"}
-      </button>
+
+      <span className={styles.unit2}>days</span>
+    </div>
+    <div className={styles.durationInput}>
+      <input
+        type="number"
+        value={durationHours}
+        onChange={handleDurationHour}
+        min={0}
+        max={23}
+        className={styles.input2}
+      />
+      <span className={styles.unit2}>hours</span>
+    </div>
+  </div>
+</div>
+
+
+
+  <button
+    className={styles.button}
+    onClick={handlePost}
+    disabled={posting || !content.trim()}
+  >
+    {posting ? "Posting..." : "Post"}
+  </button>
+
+      </div>
+      <div className={styles.right_container}>
+      {steps.map((step, index) => (
+        <div className={styles.step} key={index}>
+          <div className={styles.stepHeader}>
+            <span className={`${styles.statusIndicator} ${styles[step.status]}`}></span>
+            <span
+              className={`${styles.progresslabel} ${
+                step.status === "default" ? styles.labelDefault : ""
+              }`}
+            >
+              {step.label}
+            </span>
+          </div>
+          <div className={styles.progressText}>{step.progressText}</div>
+        </div>
+      ))}
+
+      <div className={styles.finalProgressText}>{finalProgressText}</div>
+    </div>
+
+
 
       {/* <button
         className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50"
@@ -358,12 +661,12 @@ const PostCreator = () => {
         ADD QUESTION
       </button> */}
 
-      {status === "success" && (
+      {/* {status === "success" && (
         <p className="text-green-600 mt-2">Post created successfully!</p>
       )}
       {status === "error" && error && (
         <p className="text-red-600 mt-2">Error: {error}</p>
-      )}
+      )} */}
     </div>
   );
 };
