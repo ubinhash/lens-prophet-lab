@@ -145,8 +145,15 @@ export function handlePredictionResolved(event: PredictionResolvedEvent): void {
       prediction.challengeDeadline,
       event.block.timestamp
     );
+
+    let oldscore=score.score;
   
-    score.score = newScore;
+    if(event.params.resolution == 1){
+      score.score=oldscore.plus(newScore);
+    }
+    if(event.params.resolution == 2){
+      score.score=oldscore.minus(newScore);
+    }
   
     score.save();
 

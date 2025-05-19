@@ -5,7 +5,7 @@ import { fetchAccount } from "@lens-protocol/client/actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import PredictionCard from "./prediction-card";
-
+import Link from "next/link";
 import styles from './page.module.css';
 import { TopProphetCard } from "./prophet-card";
 /**
@@ -58,12 +58,16 @@ export default async function Home() {
             {!account && <Login />}
             {account &&    
            <div className="flex gap-x-4 mt-0">
-                <button className="mt-3 px-6 py-3 bg-black text-white rounded" >
+            <Link href="/create">
+                <button className="mt-3 px-6 py-3 bg-black text-white rounded" style={{ cursor:"pointer" }}>
                         Predict
                 </button>
-                <button className="mt-3 px-6 py-3 bg-black text-white rounded" style={{ backgroundColor: 'rgb(137, 179, 82)' }}>
+            </Link>
+            <Link href="/discover">
+                <button className="mt-3 px-6 py-3 bg-black text-white rounded" style={{ backgroundColor: 'rgb(137, 179, 82)',cursor:"pointer" }}>
                     Discover
                 </button>
+              </Link>
              </div>
          }
         </div>
