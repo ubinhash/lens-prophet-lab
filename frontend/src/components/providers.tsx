@@ -12,14 +12,14 @@ import { ThemeProvider } from "next-themes";
 const wagmiConfig = createConfig(
   getDefaultConfig({
     walletConnectProjectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "",
-    chains: [chains.testnet,chains.mainnet],
+    chains: [chains.mainnet],
     transports: {
       [chains.mainnet.id]: http(),
       [chains.testnet.id]: http(),
     },
     appName: "Lens Prophet Lab",
     appDescription: "User centric social preidction market",
-    appUrl: "https://lens-prophet-lab.vercel.app/",
+    appUrl: "https://lens-prophet-lab.vercel.app",
     appIcon: "https://totally.real.com/logo.png",
   }),
 );
