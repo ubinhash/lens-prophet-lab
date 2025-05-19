@@ -18,40 +18,44 @@ import { max } from "date-fns";
 import styles from './page.module.css';
 import { useMemo } from 'react';
 
-function VariablesList({ templateId }: { templateId: number }) {
-  const { data, isError, isLoading } = useContractRead({
-    address: process.env.NEXT_PUBLIC_QUESTION_CONTRACT,
-    abi: questionABI,
-    functionName: 'getVariables',
-    args: [templateId],
-  })
+import { Login } from '@/components/login';
 
-  if (isLoading) return <div>Loading variables...</div>
-  if (isError) return <div>Error fetching variables</div>
+import { useAuthenticatedUser } from "@lens-protocol/react";
 
-  // `data` is an array of Variable objects with { name, paramType, options }
-  const variables = data ?? []
+// function VariablesList({ templateId }: { templateId: number }) {
+//   const { data, isError, isLoading } = useContractRead({
+//     address: process.env.NEXT_PUBLIC_QUESTION_CONTRACT as `0x${string}`,
+//     abi: questionABI,
+//     functionName: 'getVariables',
+//     args: [templateId],
+//   })
 
-  // Build a map: name -> { paramType, options }
-  const variableMap = variables.reduce<Record<string, { paramType: number; options: string[] }>>((acc, v) => {
-    acc[v.name] = { paramType: v.paramType, options: v.options }
-    return acc
-  }, {})
+//   if (isLoading) return <div>Loading variables...</div>
+//   if (isError) return <div>Error fetching variables</div>
 
-  return (
-    <div>
-      <h3>Variables for Template {templateId}</h3>
-      <ul>
-        {variables.length === 0 && <li>No variables found</li>}
-        {variables.map((v: any, i: number) => (
-          <li key={i}>
-            <b>{v.name}</b> - Type: {v.paramType} - Options: {v.options.length ? v.options.join(', ') : 'None'}
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
+//   // `data` is an array of Variable objects with { name, paramType, options }
+//   const variables = data ?? []
+
+//   // Build a map: name -> { paramType, options }
+//   const variableMap = variables.reduce<Record<string, { paramType: number; options: string[] }>>((acc, v) => {
+//     acc[v.name] = { paramType: v.paramType, options: v.options }
+//     return acc
+//   }, {})
+
+//   return (
+//     <div>
+//       <h3>Variables for Template {templateId}</h3>
+//       <ul>
+//         {variables.length === 0 && <li>No variables found</li>}
+//         {variables.map((v: any, i: number) => (
+//           <li key={i}>
+//             <b>{v.name}</b> - Type: {v.paramType} - Options: {v.options.length ? v.options.join(', ') : 'None'}
+//           </li>
+//         ))}
+//       </ul>
+//     </div>
+//   )
+// }
 
 const PostCreator = () => {
   // const { address } = useAccount();
@@ -102,9 +106,9 @@ const PostCreator = () => {
     }
   };
 
-  const handleSetStake = (e) => {
+  const handleSetStake = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setStake(value);
+    setStake(parseFloat(value));
   
     const parsed = parseFloat(value);
     if (value === "") {
@@ -118,9 +122,9 @@ const PostCreator = () => {
     }
   };
 
-  const handleSetMinStake = (e) => {
+  const handleSetMinStake = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setMinStake(value);
+    setMinStake(parseFloat(value));
   
     const parsed = parseFloat(value);
     if (value === "") {
@@ -169,7 +173,7 @@ const PostCreator = () => {
             body: JSON.stringify({
               query: `
                 {
-                  templateCreateds(first: 5 , where: { activated: true }) {
+                  templateCreateds(first: 100 , where: { activated: true }) {
                     id
                     templateText
                     category
@@ -229,7 +233,7 @@ const PostCreator = () => {
         return <div></div>;
       }
       const { data: variablesData, isLoading } = useContractRead({
-        address: process.env.NEXT_PUBLIC_QUESTION_CONTRACT,
+        address: process.env.NEXT_PUBLIC_QUESTION_CONTRACT as `0x${string}`,
         abi: questionABI,
         functionName: 'getVariables',
         args: [parseInt(selectedId)],
@@ -237,11 +241,13 @@ const PostCreator = () => {
       console.log(selectedId,"selected id")
     
       // Create map: variableName -> { paramType, options }
+  
       const variableMap: Record<string, { paramType: number; options: string[] }> = {};
-      (variablesData || []).forEach((v: any) => {
-        variableMap[v.name] = { paramType: v.paramType, options: v.options };
-      });
-    
+      if (Array.isArray(variablesData)) {
+        (variablesData || []).forEach((v: any) => {
+          variableMap[v.name] = { paramType: v.paramType, options: v.options };
+        });
+      }
       const parsed = parseTemplate(templateText);
       console.log("parse",parsed)
     
@@ -269,7 +275,29 @@ const PostCreator = () => {
         setQuestionText(filledString);
       };
       
+      const { data: authenticatedUser, loading: authUserLoading } = useAuthenticatedUser();
 
+      if(!authenticatedUser){
+      return (
+        <div
+          style={{
+            textAlign: "center",
+            margin: "4rem auto",
+            padding: "2rem",
+            maxWidth: "400px",
+            backgroundColor: "white", // soft yellow
+            border: "2px solid black",
+            borderRadius: "5px",
+            boxShadow: "0 4px 14px rgba(0, 0, 0, 0.1)",
+            fontFamily: "sans-serif",
+          }}
+        >
+          <p style={{ fontSize: "1.25rem", marginBottom: "1rem", color: "black" }}>
+            Please Login and Refresh Page
+          </p>
+          <Login />
+        </div>
+      );}
       
     
     
@@ -408,9 +436,11 @@ const PostCreator = () => {
       const result = await post(sessionClient, {
         contentUri: uri(contentUri),
         feed: evmAddress(feed_address), 
-      }).andThen(handleOperationWith(walletClient));
-      
-      
+      }).andThen(handleOperationWith(walletClient as any));
+   
+      if (!('value' in result)) {
+        throw new Error(`Transaction failed: ${(result as any).error ?? 'Unknown error'}`);
+      }
       const txHash = result.value as string;
 
       setSteps(prevSteps =>
@@ -432,7 +462,7 @@ const PostCreator = () => {
       addQuestion(txHash);
       setFinalProgressText("Post Created Successfully")
       setStatus("success");
-      setContent("");
+      // setContent("");
     } catch (err: any) {
       console.error(err);
       setStatus("error");
@@ -456,7 +486,7 @@ const PostCreator = () => {
     // const templateId=1
     
        const hash = await walletClient.writeContract({
-        address: process.env.NEXT_PUBLIC_PREDICTION_CONTRACT,
+        address: process.env.NEXT_PUBLIC_PREDICTION_CONTRACT as `0x${string}`,
         abi: contractAbi,
         functionName: "createPrediction",
         args: [postTx, selectedId,variableNames,variableValues,questionText,BigInt(minstake * 1e18),BigInt(maxstake * 1e18),challengeDurationSeconds],

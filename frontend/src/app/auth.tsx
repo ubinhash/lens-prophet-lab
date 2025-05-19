@@ -15,7 +15,9 @@ async function getAuthenticatedAccount() {
     return null;
   }
 
-  const authenticatedUser = client.getAuthenticatedUser().unwrapOr(null);
+  // const authenticatedUser = client.getAuthenticatedUser().unwrapOr(null);
+  const res = await client.getAuthenticatedUser();
+  const authenticatedUser = res.unwrapOr(null);
   if (!authenticatedUser) {
     return null;
   }

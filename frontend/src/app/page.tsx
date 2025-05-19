@@ -5,7 +5,9 @@ import { fetchAccount } from "@lens-protocol/client/actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import PredictionCard from "./prediction-card";
+
 import styles from './page.module.css';
+import { TopProphetCard } from "./prophet-card";
 /**
  * Fetches authenticated user account if logged in
  */
@@ -25,13 +27,13 @@ async function getAuthenticatedAccount() {
 }
 
 
-export async function logoutFromLens() {
-  const client = await getLensClient();
+// export async function logoutFromLens() {
+//   const client = await getLensClient();
 
-  if (client.isSessionClient()) {
-    await client.logout();
-  }
-}
+//   if (client.isSessionClient()) {
+//     await client.logout();
+//   }
+// }
 
 export default async function Home() {
   const account = await getAuthenticatedAccount();
@@ -74,7 +76,7 @@ export default async function Home() {
   
     {/* Right Side: Placeholder Cards */}
     <div className="flex flex-col space-y-6 mt-12 lg:mt-0 lg:ml-8 ">
-      <div className="w-80 h-60 bg-green-100 rounded shadow-md"></div>
+      <div className="w-80 h-60 bg-green-100 rounded shadow-md"><TopProphetCard></TopProphetCard></div>
       <div className="w-80 h-60 bg-rose-100 rounded shadow-md"><PredictionCard></PredictionCard></div>
     </div>
   </div>

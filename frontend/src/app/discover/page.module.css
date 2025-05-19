@@ -49,7 +49,7 @@ color:white;
   }
   
   .challengeButton {
-    margin-top: 1rem;
+    margin-top: 10px;
     padding: 0.5rem 1.25rem;
     background-color: #000;
     color: #fff;
@@ -73,7 +73,7 @@ color:white;
   
     padding:0px 10px;
     border-radius: 5px;
-
+    color:rgb(85, 85, 85);
     overflow-y: scroll;
   }
   .username{
@@ -93,8 +93,8 @@ color:white;
     text-align: left;
   }
   .description_container{
-    border-top: 2px solid black;
-    border-bottom: 2px solid black;
+    border-top: 5px double black;
+    border-bottom: 5px double black;
 
     padding:10px;
     border-radius: 0px;

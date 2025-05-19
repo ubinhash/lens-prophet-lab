@@ -6,11 +6,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: QuestionTemplateManager
-    network: lens-testnet
+    network: lens
     source:
-      address: "0x59CD393802cC1f772075d1FAC2294B92D3f519C8"
+      address: "0x48d5C7801658b29e413F343B5998c733662b24c4"
       abi: QuestionTemplateManager
-      startBlock: 3613900
+      startBlock: 1826800
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -35,11 +35,11 @@ dataSources:
       file: ./src/question-template-manager.ts
   - kind: ethereum
     name: PredictionManager
-    network: lens-testnet
+    network: lens
     source:
-      address: "0xe54D5304E13A7Ca30c1323e755f7e754E94c71f7"
+      address: "0x9BF1Cfac8AE303Be2637bA928Ef5cb8A8E136579"
       abi: PredictionManager
-      startBlock: 3613900
+      startBlock: 1826800
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

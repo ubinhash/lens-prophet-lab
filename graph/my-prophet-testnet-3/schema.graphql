@@ -82,6 +82,8 @@ type PredictionCreated @entity {
   transactionHash: Bytes!
   resolution: Int!
   challengeDeadline: BigInt!
+  currentStake: BigInt!
+  challengers: [Bytes!]!
 
 }
 
@@ -103,4 +105,15 @@ type ChallengeDeadlineChanged @entity{
   transactionHash: Bytes!
 
 }
+
+type Score @entity {
+  id: ID!                    # This will be the sender's address (Bytes as string)
+  total_prediction: Int!     # total number of predictions created by sender
+  prediction_correct: Int!
+  prediction_incorrect: Int!
+  prediction_invalidated: Int!
+  score: BigDecimal!         # The calculated score (can be decimal)
+}
+
+
 

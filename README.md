@@ -2,7 +2,7 @@
 
 ## Project Intro
 
-### The problem we're trying to solve
+### The Problem 
 
 Every day, influencers make bold market calls — but only celebrate the wins and delete their post on lost. 
 
@@ -10,9 +10,11 @@ So how do we discover people who are actually good at making market calls? Lens 
 
 We are building a novel user-centric social prediction market where the focus is the the user and the content they create, centered around predictions.
 
-### Mechanics
+## What are we building?
 
 Built on Lens Protocol, it’s a social prediction arena where users post future claims and reasoning — like “ETH will hit $5k by October” — and back them with real stakes. Others can challenge by placing bet against those predictions. If you’re right consistently, your reputation grows. If you're wrong, everyone sees it.
+
+### Mechanics
 
 But how do we ensure people are gaming the system? Here's the twist:
 
@@ -47,9 +49,25 @@ We are creating a space where good prophet will get climb on the top and get the
 
 ## Smart Contracts
 
+### Prediction Resolution
+
+We use a centralized prediction resolution system for robustness and simplicity. This means:
+
+- A trusted operator is authorized to resolve predictions manually based on the outcome.
+
+- To streamline/semi-automate the process, we create templates for common types of predictions (e.g., specific sports events, on-chain price action etc)
+
+- Predictions linked to the same template can be batch resolved efficiently this way.
+
 ## Future Improvments
 
 - Follower Social-Fi Component 
     - We may add a social-fi aspect of the game to allow good prophet can monitize their influence. Top prophet can sell their predictions or create predictions where only followers can challenge.
+
+- More advanced scoring algorithm
+    - Due to time constraint, the current scoring algorithm is quite basic. But the exsistence of template will allow us to perform custom weighting for specific questions based on the parameters in the future
+        - For example we may adjust the scoring weight for price prediction based on the variance and price of each token as well. If the user's prediction is too "safe" , then it will recieve minimal weighting.
+- Complex Feed Structure
+    - Currently we are doing for text-only metadata uploading for feed for simplicity. In the future will may support images/commenting.
     
 - 

@@ -17,9 +17,9 @@ const wagmiConfig = createConfig(
       [chains.mainnet.id]: http(),
       [chains.testnet.id]: http(),
     },
-    appName: "Lens App",
-    appDescription: "Future of decentralized social",
-    appUrl: "https://totally.real.com",
+    appName: "Lens Prophet Lab",
+    appDescription: "User centric social preidction market",
+    appUrl: "https://lens-prophet-lab.vercel.app/",
     appIcon: "https://totally.real.com/logo.png",
   }),
 );

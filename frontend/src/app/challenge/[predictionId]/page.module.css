@@ -1,0 +1,188 @@
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: system-ui, sans-serif;
+    
+  }
+  
+  .card {
+    border: 2px solid #000000;
+    border-bottom: 4px solid black;
+    border-right: 4px solid black;
+    background: #fff;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .title{
+    font-size: 20px;
+    font-weight: bold;
+  }
+  .postContent {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 1rem;
+    margin-top: 10px;
+    text-align: center;
+  }
+  
+  .author {
+    font-size: 0.95rem;
+    color: #888;
+    font-style: italic;
+  }
+  
+  .progressWrapper {
+    margin: 2rem 0;
+    width: 100%;
+  }
+  
+  .progressBar {
+    position: relative;
+    height: 30px;
+    background-color: #ffffff;
+    border-radius: 3px;
+    overflow: hidden;
+    border: 2px solid black;
+    
+  }
+  
+  .currentBar {
+    /* background: linear-gradient(90deg, #0070f3, #00b3ff); */
+    background: rgb(0, 0, 0);
+    height: 100%;
+    transition: width 0.3s ease;
+  }
+  .currentBar2 {
+    position: absolute;
+    top: -6px;
+    height: 36px;
+    background-color: rgba(82, 201, 78, 0.25);
+  }
+  
+  .minMarker {
+    position: absolute;
+    top: -6px;
+    width: 3px;
+    height: 36px;
+    background-color: rgb(82, 201, 78);
+  }
+  .minMarker2 {
+    position: absolute;
+    top: 7px;
+
+   color:rgb(68, 68, 68);
+   font-size: 10px;
+    height: 36px;
+
+  }
+  
+  .progressLabels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    color: #555;
+  }
+  
+  .button {
+    margin-top: 2rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    background-color: #000000;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition:all 0.4s ease;
+  }
+  
+  .button:hover {
+    background-color: #566d4a;
+  }
+  
+  .tooltipWrapper {
+    position: relative;
+    display: inline-block;
+    margin-left: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    font-size: 12px;
+    line-height: 16px;
+    text-align: center;
+    background-color: #ccc;
+    color: #fff;
+  }
+  
+  .tooltipText {
+    visibility: hidden;
+    width: 220px;
+    background-color: #333;
+    color: #fff;
+    text-align: left;
+    padding: 8px;
+    border-radius: 6px;
+    position: absolute;
+    z-index: 100;
+    bottom: 125%; /* above the icon */
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.2s;
+    font-size: 12px;
+  }
+  
+  .tooltipWrapper:hover .tooltipText {
+    visibility: visible;
+    opacity: 1;
+  }
+  .greenLabel{
+    color:green;
+  }
+  
+  
+  .input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 2px solid #000000;
+    border-radius: 6px;
+    font-size: 1rem;
+    margin-top: 2px;
+  }
+
+  .resolutionStatus {
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 600;
+    margin: 1rem 0;
+    text-align: center;
+    font-size: 1.05rem;
+    transition: background 0.3s ease;
+  }
+  
+  .correct {
+    background-color: #e6f7e9;
+    color: #2e7d32;
+    border: 1px solid #b2dfdb;
+  }
+  
+  .incorrect {
+    background-color: #fdecea;
+    color: #c62828;
+    border: 1px solid #f5c6cb;
+  }
+  
+  .invalidated {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+  }
+  
