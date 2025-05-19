@@ -14,6 +14,8 @@ We are building a novel user-centric social prediction market where the focus is
 
 Built on Lens Protocol, it’s a social prediction arena where users post future claims and reasoning — like “ETH will hit $5k by October” — and back them with real stakes. Others can challenge by placing bet against those predictions. If you’re right consistently, your reputation grows. If you're wrong, everyone sees it.
 
+![Screenshot](screenshots/mainpage.png)
+
 ### Mechanics
 
 But how do we ensure people are gaming the system? Here's the twist:
@@ -48,6 +50,11 @@ We are creating a space where good prophet will get climb on the top and get the
 - Hardhat Boilerplate: https://github.com/lens-protocol/lens-network-hardhat-boilerplate
 
 ## Smart Contracts
+
+- **Prediction Creation**: [0x9BF1Cfac8AE303Be2637bA928Ef5cb8A8E136579](https://explorer.lens.xyz/address/0x9BF1Cfac8AE303Be2637bA928Ef5cb8A8E136579)
+- **Question Template Creation**: [0x48d5C7801658b29e413F343B5998c733662b24c4](https://explorer.lens.xyz/address/0x48d5C7801658b29e413F343B5998c733662b24c4)
+
+
 
 ### Prediction Resolution
 
