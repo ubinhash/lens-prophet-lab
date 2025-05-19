@@ -37,7 +37,7 @@ Followers can challenge high-confidence claims with smaller stakes and earn a pr
 
 So climb on the top , and get your words be heard.
 
-![Screenshot](screenshots/mainpage.png)
+![Screenshot](https://github.com/ubinhash/lens-prophet-lab/blob/main/screenshots/mainpage.png)
 
 
 ### What's novel about this project?
@@ -76,6 +76,9 @@ We use a centralized prediction resolution system for robustness and simplicity.
 
 - Predictions linked to the same template can be batch resolved efficiently this way.
 
+### Workflow
+
+![Screenshot](https://github.com/ubinhash/lens-prophet-lab/blob/main/screenshots/workflow.png)
 
 
 ## Tech Stack
