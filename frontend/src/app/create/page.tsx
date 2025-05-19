@@ -275,29 +275,7 @@ const PostCreator = () => {
         setQuestionText(filledString);
       };
       
-      const { data: authenticatedUser, loading: authUserLoading } = useAuthenticatedUser();
-
-      if(!authenticatedUser){
-      return (
-        <div
-          style={{
-            textAlign: "center",
-            margin: "4rem auto",
-            padding: "2rem",
-            maxWidth: "400px",
-            backgroundColor: "white", // soft yellow
-            border: "2px solid black",
-            borderRadius: "5px",
-            boxShadow: "0 4px 14px rgba(0, 0, 0, 0.1)",
-            fontFamily: "sans-serif",
-          }}
-        >
-          <p style={{ fontSize: "1.25rem", marginBottom: "1rem", color: "black" }}>
-            Please Login and Refresh Page
-          </p>
-          <Login />
-        </div>
-      );}
+      
       
     
     
@@ -530,7 +508,29 @@ const PostCreator = () => {
   
 
   // In your JSX:
+  const { data: authenticatedUser, loading: authUserLoading } = useAuthenticatedUser();
 
+  if(!authenticatedUser){
+  return (
+    <div
+      style={{
+        textAlign: "center",
+        margin: "4rem auto",
+        padding: "2rem",
+        maxWidth: "400px",
+        backgroundColor: "white", // soft yellow
+        border: "2px solid black",
+        borderRadius: "5px",
+        boxShadow: "0 4px 14px rgba(0, 0, 0, 0.1)",
+        fontFamily: "sans-serif",
+      }}
+    >
+      <p style={{ fontSize: "1.25rem", marginBottom: "1rem", color: "black" }}>
+        Please Login and Refresh Page
+      </p>
+      <Login />
+    </div>
+  );}
 
   return (
     <div className={styles.container}>

@@ -15,6 +15,7 @@ import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ScrollArea } from "./ui/scroll-area";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface AccountSelectorProps {
   open: boolean;
@@ -89,9 +90,16 @@ export function AccountSelector({
           <div className="grid grid-cols-3 gap-2">
             {accountsLoading && <div className="text-sm text-muted-foreground col-span-3">Loading accounts...</div>}
             {availableAccounts && availableAccounts.items.length === 0 && (
-              <p className="text-sm text-muted-foreground col-span-3">
-                No Lens profiles found for this wallet.
-              </p>
+                <div className="space-y-2 col-span-3">
+                <p className="text-sm text-muted-foreground break-words">
+                  No Lens profiles found for this wallet.
+                </p>
+                <p className="text-sm">
+                  <Link href="https://onboarding.lens.xyz/" target="_blank" className="text-blue-500 underline hover:text-blue-600">
+                    Create one at Lens
+                  </Link>
+                </p>
+              </div>
             )}
             {availableAccounts && availableAccounts.items.length > 0 && (
               availableAccounts.items.map((acc) => {
@@ -121,6 +129,8 @@ export function AccountSelector({
                 );
               })
             )}
+
+            
           </div>
         </ScrollArea>
       </DialogContent>
