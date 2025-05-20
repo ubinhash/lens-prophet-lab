@@ -80,12 +80,17 @@ Contract Owner can create prediction templates on the `QuestionTemplateManager` 
 
 Sample Template Definition
 
-Question: [TOKEN] be [Operator] $[TARGET_PRICE]  on [DEADLINE]?
-Params: 
-    - [TOKEN]| String| [BTC, ETH ....]
-    - [Operator]|String| [above, below]
-    - [TARGET_PRICE]|Number| 
-    - [DEADLINE] | Date
+Question: `[TOKEN]` be `[Operator]` $`[TARGET_PRICE]` on `[DEADLINE]`?
+
+Params:
+
+- `[TOKEN]` => String| [BTC, ETH ....]
+
+- `[Operator]` => String| [above, below]
+
+- `[TARGET_PRICE]`=> Number
+
+- `[DEADLINE]` => Date
 
 After the params are added, the owner can then activate a template to indicate it can be used in prediction creation process.
 
@@ -112,16 +117,16 @@ The prediction have a `postId` field linked to the hex of lens feed. When we fet
 
 Disagree with a prediction? Challengers can stake to challenge a prediction up to the defined max.
 
-a. Prediction Correct
+*** a. Prediction Correct ***
 
 Owner will get their stake back + get all the challenger's stake. (With small fee charged on the winning portion)
 
 
-b. Prediction Incorrect
+*** b. Prediction Incorrect ***
 
 Each of the challenger will get their stake back + split the predictor's stake proportionally.  (With small fee charged on the winning portion)
 
-c. Prediction Invalidated || Prediction Challenge Pool < Minimal
+*** c. Prediction Invalidated || Prediction Challenge Pool < Minimal ***
 
 In this case the stake will be returned to the respective stakers. We do charge a small fee from the predictor in this case to reduce potentially spamming.
 
@@ -200,4 +205,3 @@ Deploy with
 - Complex Feed Structure
     - Currently we are doing for text-only metadata uploading for feed for simplicity. In the future will may support images/commenting.
     
-- 
