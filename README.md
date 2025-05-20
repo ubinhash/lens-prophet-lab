@@ -61,30 +61,77 @@ So climb on the top , and get your words be heard.
 
 Demo Website: https://lens-prophet-lab.vercel.app
 
+Live on Lens Mainnet
+
 ### Smart Contract
 
-- **Prediction Creation**: [0x9BF1Cfac8AE303Be2637bA928Ef5cb8A8E136579](https://explorer.lens.xyz/address/0x9BF1Cfac8AE303Be2637bA928Ef5cb8A8E136579)
-- **Question Template Creation**: [0x48d5C7801658b29e413F343B5998c733662b24c4](https://explorer.lens.xyz/address/0x48d5C7801658b29e413F343B5998c733662b24c4)
+- **Prediction Manager **: [0x9BF1Cfac8AE303Be2637bA928Ef5cb8A8E136579](https://explorer.lens.xyz/address/0x9BF1Cfac8AE303Be2637bA928Ef5cb8A8E136579)
+- **Question Template Manager **: [0x48d5C7801658b29e413F343B5998c733662b24c4](https://explorer.lens.xyz/address/0x48d5C7801658b29e413F343B5998c733662b24c4)
 
-### Regarding Prediction Resolution
+## Technical Details
+
+### 1. Workflow
+
+![Screenshot2](https://github.com/ubinhash/lens-prophet-lab/blob/main/screenshots/workflow.png)
+
+### 1. Prediction Template Creation
+
+Contract Owner can create prediction templates on the `QuestionTemplateManager` contract for the users to use based on current events and community interest, to ensure that the predictions are in valid forms.
+
+Sample Template Definition
+
+Question: [TOKEN] be [Operator] $[TARGET_PRICE]  on [DEADLINE]?
+Params: 
+    - [TOKEN]| String| [BTC, ETH ....]
+    - [Operator]|String| [above, below]
+    - [TARGET_PRICE]|Number| 
+    - [DEADLINE] | Date
+
+After the params are added, the owner can then activate a template to indicate it can be used in prediction creation process.
+
+During the creation process user will need to select a template ID and fill in the params, and the basic validity of params will be checked on chain.
+
+
+### 2.Regarding Prediction Resolution
 
 We use a centralized prediction resolution system for robustness and simplicity. This means:
 
-- A trusted operator is authorized to resolve predictions manually based on the outcome.
+- A trusted operator(eg owner) is authorized to resolve predictions manually based on the outcome.
 
 - To streamline/semi-automate the process, we create templates for common types of predictions (e.g., specific sports events, on-chain price action etc)
 
 - Predictions linked to the same template can be batch resolved efficiently this way.
 
-### Workflow
+### 3. Lens Feed Fetching
 
-![Screenshot2](https://github.com/ubinhash/lens-prophet-lab/blob/main/screenshots/workflow.png)
+During the prediction creation process, the reasoning part is created as a lens feed, posting to a specific feed url, stored in grove and will be linked to the prediction on chain.
+
+The prediction have a `postId` field linked to the hex of lens feed. When we fetch and render latest prediction from graph, we also render the reasoning detail by querying the lens protocol api.
+
+### 4. Stake Splitting
+
+Disagree with a prediction? Challengers can stake to challenge a prediction up to the defined max.
+
+a. Prediction Correct
+
+Owner will get their stake back + get all the challenger's stake. (With small fee charged on the winning portion)
+
+
+b. Prediction Incorrect
+
+Each of the challenger will get their stake back + split the predictor's stake proportionally.  (With small fee charged on the winning portion)
+
+c. Prediction Invalidated || Prediction Challenge Pool < Minimal
+
+In this case the stake will be returned to the respective stakers. We do charge a small fee from the predictor in this case to reduce potentially spamming.
+
+
 
 
 ## Tech Stack
 
 - Frontend: Next Js
-- Indexing : GraphQL
+- Indexing : The Graph
 - Smart Contract: Hardhat
 - Wallet Connection: Connect Kit + Continue with Family 
 - Lens Social Primitive Used: Account & Feed (the prediction's reasoning is stored as lens feed, referenced)
