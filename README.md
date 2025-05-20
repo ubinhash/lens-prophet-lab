@@ -109,9 +109,9 @@ We use a centralized prediction resolution system for robustness and simplicity.
 
 ### 3. Lens Feed Fetching
 
-During the prediction creation process, the reasoning part is created as a lens feed, posting to a specific feed url, stored in grove and will be linked to the prediction on chain.
+During the prediction creation process, the reasoning part is created as a lens feed, posting to a specific feed url (with your lens account), stored in grove and will be linked to the prediction on chain with your crypto wallet.
 
-The prediction have a `postId` field linked to the hex of lens feed. When we fetch and render latest prediction from graph, we also render the reasoning detail by querying the lens protocol api.
+The prediction have a `postId` field linked to the hex of lens feed (So you can potentially reference **other's post**, currently not supported via UI). When we fetch and render latest prediction from graph, we also render the reasoning detail by querying the lens protocol api.
 
 ### 4. Stake Splitting
 
